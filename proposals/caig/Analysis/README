@@ -1,4 +1,9 @@
 Grab Theta with Eta
 
+Modify knonwn_models.py in xmitgcm/llcreader to have these paths:
+
+    base_path = 'https://data.nas.nasa.gov/ecco/eccodata/llc_4320/compressed'
+    grid_path = 'https://data.nas.nasa.gov/ecco/eccodata/llc_4320/grid'
+
 
 ulmo_grab_llc 12 --var Theta,U,V,W,Salt,Eta --istart 0
