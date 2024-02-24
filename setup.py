@@ -27,7 +27,7 @@ setup_keywords['install_requires'] = [
     'healpy', 'cftime', 'bokeh', 'umap-learn', 'llvmlite', 'boto3',
     'xarray', 'h5netcdf', 'emcee', 'corner',
     'importlib-metadata', 'timm==0.3.2',
-    'scikit-learn', 'scikit-image', 'tqdm']
+    'scikit-learn', 'scikit-image', 'tqdm', 'gsw']
 setup_keywords['zip_safe'] = False
 setup_keywords['use_2to3'] = False
 setup_keywords['packages'] = find_packages()
