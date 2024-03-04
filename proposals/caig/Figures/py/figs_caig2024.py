@@ -90,11 +90,13 @@ def fig_fronts(outfile:str='MNIST.png'):
     # Theta
     ax_T = plt.subplot(gs[0])
     cbar_kws['label'] = 'SST (deg C)'
-    img = plt.(np.flipud(Theta), xticklabels=[], 
+    img = ax_T.imshow(np.flipud(Theta), 
                      #vmin=vmnx[0], vmax=vmnx[1], 
-                     ax=ax_T,
-                     yticklabels=[], cmap=cm, cbar=True, 
-                     cbar_kws=cbar_kws)
+                     cmap=cm)
+    cbaxes = plt.colorbar(img, pad=0., 
+                          fraction=cbar_kws['fraction'])#, orientation='horizontal') #location='left')
+    cbaxes.set_label(cbar_kws['label'], fontsize=17.)
+    cbaxes.ax.tick_params(labelsize=15)
     all_ax.append(ax_T)
 
     # Front intensity
