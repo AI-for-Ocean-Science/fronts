@@ -98,7 +98,7 @@ def preproc_field(field, mask, inpaint=True, median=True, med_size=(3,1),
                   downscale=True, dscale_size=(2,2), sigmoid=False, scale=None,
                   expon=None, only_inpaint=False, gradient=False,
                   min_mean=None, de_mean=True,
-                  field_size=None,
+                  field_size:int=None,
                   fixed_km=None,
                   noise=None,
                   log_scale=False, **kwargs):
@@ -145,6 +145,9 @@ def preproc_field(field, mask, inpaint=True, median=True, med_size=(3,1),
         If provided, require the image has a mean exceeding this value
     fixed_km : float, optional
         If provided the input image is smaller than desired, so cut it down!
+        field_size must also be provided
+    field_size : int, optional
+        Size of the field
     **kwargs : catches extraction keywords
 
     Returns

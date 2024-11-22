@@ -29,7 +29,7 @@ def load_coords(verbose=True):
     coord_file = os.path.join(os.getenv('OS_OGCM'), 'LLC', 'LLC_coords.nc')
     if verbose:
         print("Loading LLC coords from {}".format(coord_file))
-    coord_ds = xr.load_dataset(coord_file)
+    coord_ds = xr.load_dataset(coord_file, engine='h5netcdf')
     return coord_ds
 
 def load_CC_mask(field_size=(64,64), verbose=True, local=True):

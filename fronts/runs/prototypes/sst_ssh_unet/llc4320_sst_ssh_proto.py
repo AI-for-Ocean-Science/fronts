@@ -95,26 +95,34 @@ def preproc_super(extract_file:str, debug:bool=False):
 
 
     extract_dict = {'fields': ['SST','SSS'],
-             'fixed_km': 144.,
              'field_size': 64,
-             'pdicts': {'SST': 
-                {
-                    "quality_thresh": 2,
-                    "nrepeat": 1,
-                    "temp_bounds": [
-                        -2,
-                        33
-                    ],
-                    "downscale": False,
-                    "inpaint": False,
-                    "med_size": [
-                        3,
-                        1
-                    ],
-                    "median": False,
-                    "only_inpaint": False
-                }
-             }}
+             'pdicts': 
+                 {
+                     'SST': 
+                        {
+                        'fixed_km': 144.,
+                        'field_size': 64,
+                        "quality_thresh": 2,
+                        "nrepeat": 1,
+                        "downscale": False,
+                        "inpaint": False,
+                        "median": False,
+                        "only_inpaint": False
+                        }
+                    ,
+                     'SSS': 
+                        {
+                        'fixed_km': 144.,
+                        'field_size': 64,
+                        "quality_thresh": 2,
+                        "nrepeat": 1,
+                        "downscale": False,
+                        "inpaint": False,
+                        "median": False,
+                        "only_inpaint": False
+                        }
+                 }
+             }
 
     # Prep LLC Table
     llc_table = process.prep_table_for_preproc(
@@ -127,8 +135,9 @@ def preproc_super(extract_file:str, debug:bool=False):
         # Preprocess
         llc_table, success, pp_fields, meta = extract.preproc_field(
             llc_table, field, extract_dict['pdicts'][field],
-                                    n_cores=10, dlocal=True,
-                                    test_failures=False)
+            fixed_km=extract_dict['pdicts'][field]['fixed_km'],
+            n_cores=10, dlocal=True,
+            test_failures=False)
 
         # Write
         f.create_dataset(field, data=np.array(pp_fields).astype(np.float32))
