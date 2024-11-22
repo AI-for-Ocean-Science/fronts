@@ -7,6 +7,7 @@ import numpy as np
 
 import pandas
 import xarray
+import json
 
 #from ulmo.llc import extract 
 #from ulmo.llc import uniform
@@ -21,6 +22,7 @@ from fronts import io as fronts_io
 from IPython import embed
 
 local_out_path = os.path.join(os.getenv('OS_OGCM'), 'LLC', 'Fronts')
+super_tbl_file = os.path.join(local_out_path, 'LLC4320_SST144_SSS40_super_test.parquet')
 
 def generate_super_table(debug=False, resol=0.5, plot=False,
                minmax_lat=(-90.,57.), field_size=(64,64),
@@ -38,7 +40,7 @@ def generate_super_table(debug=False, resol=0.5, plot=False,
     """
 
     if debug:
-        tbl_file = os.path.join(local_out_path, 'LLC4320_SST144_SSS40_super_test.parquet')
+        tbl_file = super_tbl_file
     else:
         tbl_file = os.path.join(local_out_path, 'LLC4320_SST144_SSS40_super.parquet')
 
@@ -56,14 +58,27 @@ def generate_super_table(debug=False, resol=0.5, plot=False,
     else:
         # Extract 24 days across the full range;  ends of months; every 2 weeks
         dti = pandas.date_range('2011-09-13', periods=24, freq='2W')
-    llc_table = table.add_days(llc_table, dti, outfile=tbl_file)
+
+    # Add days
+    llc_table = table.add_days(llc_table, dti, outfile=tbl_file, to_s3=False)
+
+    # Add UIDs
+    _ = table.add_uid(llc_table, outfile=tbl_file, to_s3=False)
 
     print(f"Wrote: {tbl_file} with {len(llc_table)} unique cutouts.")
     print("All done with init")
 
     if debug:
-        embed(header='63 of llc4320_sst_ssh_proto.py')
+        embed(header='71 of llc4320_sst_ssh_proto.py')
 
+def preproc_super(preproc_file:str):
+    # Load JSON
+    with open(preproc_file, 'r') as infile:
+        preproc_dict = json.load(infile)
+
+    # Load the table
+
+    pass
 
 def main(flg:str):
     flg= int(flg)
@@ -71,7 +86,7 @@ def main(flg:str):
     # Generate the LLC Table
     if flg == 1:
         # Debug
-        generate_super_table(debug=True, plot=True)
+        generate_super_table()#debug=True, plot=True)
 
 # Command line execution
 if __name__ == '__main__':
@@ -80,6 +95,8 @@ if __name__ == '__main__':
     if len(sys.argv) == 1:
 
         flg = 1 # Generate super table
+        flg = 2 # Preproc super table
+
         #flg += 2 ** 1  # 2 -- Extract
         #flg += 2 ** 2  # 4 -- Evaluate (with noise)
         #flg += 2 ** 3  # 8 -- Evaluate (without noise)

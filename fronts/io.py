@@ -304,7 +304,8 @@ def write_bytes_to_s3(bytes_:BytesIO, s3_uri:str):
                              Bucket=parsed_s3.netloc, 
                              Key=parsed_s3.path[1:])
 
-def write_main_table(main_table:pandas.DataFrame, outfile:str, to_s3=True):
+def write_main_table(main_table:pandas.DataFrame, outfile:str, 
+                     to_s3=True):
     """Write Main table for ULMO analysis
     Format is determined from the outfile extension.
         Options are ".csv", ".feather", ".parquet"
