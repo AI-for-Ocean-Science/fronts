@@ -8,6 +8,7 @@ import numpy as np
 import pandas
 import xarray
 import json
+import h5py
 
 #from ulmo.llc import extract 
 #from ulmo.llc import uniform
@@ -17,12 +18,16 @@ import json
 #from ulmo.preproc import plotting as pp_plotting
 
 from fronts.llc import table
+from fronts.llc import extract
+from fronts.preproc import process
+from fronts.tables import catalog
 from fronts import io as fronts_io
 
 from IPython import embed
 
 local_out_path = os.path.join(os.getenv('OS_OGCM'), 'LLC', 'Fronts')
 super_tbl_file = os.path.join(local_out_path, 'LLC4320_SST144_SSS40_super_test.parquet')
+super_preproc_file = os.path.join(local_out_path, 'LLC4320_SST144_SSS40_super.h5')
 
 def generate_super_table(debug=False, resol=0.5, plot=False,
                minmax_lat=(-90.,57.), field_size=(64,64),
@@ -71,22 +76,90 @@ def generate_super_table(debug=False, resol=0.5, plot=False,
     if debug:
         embed(header='71 of llc4320_sst_ssh_proto.py')
 
-def preproc_super(preproc_file:str):
-    # Load JSON
-    with open(preproc_file, 'r') as infile:
-        preproc_dict = json.load(infile)
+def preproc_super(extract_file:str, debug:bool=False):
+
+    outfile = super_preproc_file 
 
     # Load the table
+    llc_table = pandas.read_parquet(super_tbl_file)
 
-    pass
+    # Debug?
+    if debug:
+        llc_table = llc_table.iloc[:100].copy()
+        outfile = os.path.join(local_out_path, 'LLC4320_SST144_SSS40_super_test.h5')
+
+    # Extract dict
+    # Load JSON
+    #with open(preproc_file, 'r') as infile:
+    #    preproc_dict = json.load(infile)
+
+
+    extract_dict = {'fields': ['SST','SSS'],
+             'fixed_km': 144.,
+             'field_size': 64,
+             'pdicts': {'SST': 
+                {
+                    "quality_thresh": 2,
+                    "nrepeat": 1,
+                    "temp_bounds": [
+                        -2,
+                        33
+                    ],
+                    "downscale": False,
+                    "inpaint": False,
+                    "med_size": [
+                        3,
+                        1
+                    ],
+                    "median": False,
+                    "only_inpaint": False
+                }
+             }}
+
+    # Prep LLC Table
+    llc_table = process.prep_table_for_preproc(
+        llc_table, extract_file, field_size=
+        (extract_dict['field_size'], extract_dict['field_size']))
+
+    # Open HDF5 file
+    f = h5py.File(outfile, 'w')
+    for field in extract_dict['fields']:
+        # Preprocess
+        llc_table, success, pp_fields, meta = extract.preproc_field(
+            llc_table, field, extract_dict['pdicts'][field],
+                                    n_cores=10, dlocal=True,
+                                    test_failures=False)
+
+        # Write
+        f.create_dataset(field, data=np.array(pp_fields).astype(np.float32))
+        # Add meta
+        for key in meta.keys():
+            llc_table[field+key] = meta[key]
+        # Failures?
+        if np.any(~success):
+            print("Failed to preprocess some fields")
+            fail = np.where(~success)[0]
+            llc_table.loc[fail,'pp_type'] = -999
+    f.close()    
+
+    # Write table
+    assert catalog.vet_main_table(llc_table)
+    if not debug:
+        fronts_io.write_main_table(llc_table, outfile, to_s3=False)
+    else:
+        embed(header='preproc_super 118')
+
 
 def main(flg:str):
     flg= int(flg)
 
     # Generate the LLC Table
     if flg == 1:
-        # Debug
         generate_super_table()#debug=True, plot=True)
+
+    # Generate the Super Preproc File
+    if flg == 2:
+        preproc_super('dummy_file.json', debug=True)
 
 # Command line execution
 if __name__ == '__main__':

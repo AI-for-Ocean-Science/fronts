@@ -99,7 +99,7 @@ def load_llc_ds(filename, local=False):
         with ulmo_io.open(filename, 'rb') as f:
             ds = xr.open_dataset(f)
     else:
-        ds = xr.open_dataset(filename)
+        ds = xr.open_dataset(filename, engine='h5netcdf')
     return ds
 
 def grab_cutout(data_var, row, col, field_size=None, fixed_km=None,

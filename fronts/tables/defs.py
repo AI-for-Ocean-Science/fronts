@@ -33,18 +33,6 @@ mtbl_dmodel = {
                 help='Log-likelihood of the cutout from Ulmo'),
     'clear_fraction': dict(dtype=float,
                 help='Fraction of the cutout clear from clouds'),
-    'mean_temperature': dict(dtype=(float,np.floating),
-                help='Average SST of the cutout (C deg)'),
-    'Tmin': dict(dtype=(float,np.floating),
-                help='Minimum T of the cutout (C deg)'),
-    'Tmax': dict(dtype=(float,np.floating),
-                help='Maximum T of the cutout (C deg)'),
-    'T10': dict(dtype=(float,np.floating),
-                help='10th percentile of T of the cutout (C deg)'),
-    'T90': dict(dtype=(float,np.floating),
-                help='90th percentile of T of the cutout'),
-    'DT': dict(dtype=(float,np.floating),
-                help='90th percentile of T of the cutout (C deg)'),
     'DT40': dict(dtype=(float,np.floating),
                 help='DT for inner 40x40 pixels'),
     'pp_root': dict(dtype=str,
@@ -53,11 +41,9 @@ mtbl_dmodel = {
                 help='Filename of the pre-processed file holding the cutout'),
     'pp_idx': dict(dtype=(int,np.integer), 
                 help='Index describing position of the cutout in the pp_file'),
-    'pp_type': dict(dtype=(int, np.integer), allowed=(-1, 0,1), 
-                    valid=0, train=1, init=-1,
-                    help='-1: illdefined, 0: valid, 1: train'),
-                    # In Ulmo, we use 1 for the subset of training and 0 for the rest
-                    # In SSL, we use 1 for train, 0 for validation and -1 for the rest [but not always]
+    'pp_type': dict(dtype=(int, np.integer), allowed=(-999, -1, 0), 
+                    valid=0, junk=-999, init=-1,
+                    help='-999: junk, -1: illdefined, 0: valid'),
     'zonal_slope': dict(dtype=(float,np.floating),
                 help='Power-law spectra slope in the zonal direction'),
     'zonal_slope_err': dict(dtype=(float,np.floating),
@@ -102,3 +88,24 @@ mtbl_dmodel = {
     # REQUIRED
     'required': ('lat', 'lon', 'row', 'col', 'datetime')
     }
+
+# Meta measurements
+meta_dict = {
+    'mu': dict(dtype=(float,np.floating),
+                help='Average SST of the cutout (C deg)'),
+    'min': dict(dtype=(float,np.floating),
+                help='Minimum value of the cutout'),
+    'max': dict(dtype=(float,np.floating),
+                help='Maximum value of the cutout'),
+    '10': dict(dtype=(float,np.floating),
+                help='10th percentile of field in the cutout (C deg)'),
+    '90': dict(dtype=(float,np.floating),
+                help='90th percentile of field in the cutout'),
+    'DT': dict(dtype=(float,np.floating),
+                help='90th percentile of T of the cutout (C deg)'),
+}
+
+# Append meta dict for each field below
+for field in ['SST', 'SSS']:
+    for key in meta_dict.keys():
+        mtbl_dmodel[field+key] = meta_dict[key].copy()
