@@ -94,6 +94,7 @@ def preproc_super(extract_file:str, debug:bool=False):
     #    preproc_dict = json.load(infile)
 
 
+    #extract_dict = {'fields': ['SSS'],
     extract_dict = {'fields': ['SST','SSS'],
              'field_size': 64,
              'pdicts': 
@@ -129,6 +130,7 @@ def preproc_super(extract_file:str, debug:bool=False):
         llc_table, extract_file, field_size=
         (extract_dict['field_size'], extract_dict['field_size']))
 
+
     # Open HDF5 file
     f = h5py.File(outfile, 'w')
     for field in extract_dict['fields']:
@@ -144,11 +146,16 @@ def preproc_super(extract_file:str, debug:bool=False):
         # Add meta
         for key in meta.keys():
             llc_table[field+key] = meta[key]
+
         # Failures?
         if np.any(~success):
-            print("Failed to preprocess some fields")
+            print(f"Failed to preprocess some {field} fields")
             fail = np.where(~success)[0]
             llc_table.loc[fail,'pp_type'] = -999
+        # Good
+        good = success & (llc_table['pp_type'] != -999)
+        llc_table.loc[np.where(good)[0],'pp_type'] = 0
+
     f.close()    
 
     # Write table

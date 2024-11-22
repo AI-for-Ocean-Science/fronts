@@ -75,6 +75,8 @@ def preproc_field(llc_table:pandas.DataFrame,
         # Field
         if field == 'SST':
             data = ds.Theta.values
+        elif field == 'SSS':
+            data = ds.Salt.values
         else:
             raise IOError(f"Not ready for this field {field}")
         # Parse 
