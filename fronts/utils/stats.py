@@ -18,4 +18,4 @@ def meta_stats(field:np.ndarray):
     meta_dict['mu'] = np.mean(ff)
 
     # Return
-    meta_dict
+    return meta_dict

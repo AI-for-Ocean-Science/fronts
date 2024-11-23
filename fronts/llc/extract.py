@@ -57,7 +57,7 @@ def preproc_field(llc_table:pandas.DataFrame,
     # Setup for parallel
     if field in ['SST','SSS']:
         map_fn = partial(process.preproc_image, pdict=pdict)
-    elif field in ['SST','SSS']:
+    elif field in ['Divb2']:
         map_fn = partial(po_fronts.anly_cutout, **pdict)
 
     # Setup for dates
@@ -82,6 +82,9 @@ def preproc_field(llc_table:pandas.DataFrame,
             data = ds.Theta.values
         elif field == 'SSS':
             data = ds.Salt.values
+        elif field == 'Divb2':
+            data = ds.Theta.values
+            data2 = ds.Salt.values
         else:
             raise IOError(f"Not ready for this field {field}")
         # Parse 
@@ -94,7 +97,7 @@ def preproc_field(llc_table:pandas.DataFrame,
         llc_table.loc[gd_date, 'filename'] = filename
 
         # Load up the cutouts
-        fields, smooth_pixs = [], []
+        fields, fields2, smooth_pixs = [], [], []
         for r, c in zip(coord_tbl.row, coord_tbl.col):
             if fixed_km is None:
                 dr = field_size[0]
@@ -121,22 +124,31 @@ def preproc_field(llc_table:pandas.DataFrame,
                 fields.append(None)
             else:
                 fields.append(data[use_r:use_r+dr, use_c:use_c+dc])
+            # More?
+            if field == 'Divb2':
+                fields2.append(data2[use_r:use_r+dr, use_c:use_c+dc])
         print("Cutouts loaded for {}".format(filename))
 
         # Prep items
+        zipitems = [fields]
+        if len(fields2) > 0:
+            zipitems.append(fields2)
+        zipitems.append(sub_idx)
         if 'smooth_km' in pdict.keys():
-            myzip = zip(fields, sub_idx, smooth_pixs)
-        else:
-            myzip = zip(fields, sub_idx)
-        items = [item for item in myzip]
+            zipitems.append(smooth_pixs)
+        items = [item for item in zip(*zipitems)]
 
         # Test processing
         if test_process:
             idx = 75
+            img, iidx, tmeta = po_fronts.anly_cutout(items[idx], **pdict)
+            '''
+            # Smoothing
             img, tmeta = process.preproc_field(fields[idx], None,
                                   smooth_pix=smooth_pixs[idx], 
                                   **pdict)
             # 
+            '''
             from matplotlib import pyplot as plt
             fig = plt.figure(figsize=(8,8))
             plt.clf()
@@ -172,14 +184,7 @@ def preproc_field(llc_table:pandas.DataFrame,
     img_idx = np.array(img_idx)
     ppf_idx = catalog.match_ids(img_idx, ex_idx, require_in_match=True)
 
-    #llc_table = pp_utils.write_pp_fields(
-    #    pp_fields, meta, llc_table, 
-    #    ex_idx, ppf_idx, 
-    #    valid_fraction, s3_file, local_file,
-    #    kin_meta=kin_meta, debug=debug, write_cutouts=write_cutouts)
-
-
-    # Clean up time
+    # Clean up time (indices and bad data)
 
     # Find the bad ones (if any)
     bad_idx = [int(item[1]) for item in zip(pp_fields, img_idx) if item[0] is None]

@@ -215,7 +215,7 @@ def preproc_field(field, mask, inpaint=True, median=True, med_size=(3,1),
 
     # De-mean the field
     if de_mean:
-        pp_field = field - mu
+        pp_field = field - field.mean()
     else:
         pp_field = field
 

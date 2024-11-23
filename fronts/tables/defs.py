@@ -106,6 +106,6 @@ meta_dict = {
 }
 
 # Append meta dict for each field below
-for field in ['SST', 'SSS']:
+for field in ['SST', 'SSS', 'Divb2']:
     for key in meta_dict.keys():
         mtbl_dmodel[field+key] = meta_dict[key].copy()

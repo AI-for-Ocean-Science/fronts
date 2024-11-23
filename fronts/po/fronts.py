@@ -40,7 +40,7 @@ def anly_cutout(item:tuple, fixed_km:float=None, field_size:int=None,
         gradb = resize_local_mean(gradb, (field_size, field_size))
 
     # Meta
-    meta_dict = front_stats.calc_front_stats(gradb)
+    meta_dict = front_stats.meta_stats(gradb)
 
     # Return
     return gradb, idx, meta_dict
