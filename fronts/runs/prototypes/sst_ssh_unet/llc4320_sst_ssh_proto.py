@@ -45,9 +45,9 @@ def generate_super_table(debug=False, resol=0.5, plot=False,
     """
 
     if debug:
-        tbl_file = super_tbl_file
+        tbl_file = os.path.join(local_out_path, 'LLC4320_SST144_SSS40_super_test.parquet')
     else:
-        tbl_file = os.path.join(local_out_path, 'LLC4320_SST144_SSS40_super.parquet')
+        tbl_file = super_tbl_file
 
     # Begin 
     llc_table = table.uniform_coords(resol=resol, minmax_lat=minmax_lat,
@@ -178,8 +178,10 @@ def preproc_super(extract_file:str, debug:bool=False):
     # Write table
     assert catalog.vet_main_table(llc_table)
     if not debug:
-        fronts_io.write_main_table(llc_table, outfile, to_s3=False)
+        fronts_io.write_main_table(llc_table, tbl_file, to_s3=False)
     else:
+        tbl_file = os.path.join(local_out_path, 'LLC4320_SST144_SSS40_super_test.parquet')
+        fronts_io.write_main_table(llc_table, tbl_file, to_s3=False)
         embed(header='preproc_super 118')
 
 
