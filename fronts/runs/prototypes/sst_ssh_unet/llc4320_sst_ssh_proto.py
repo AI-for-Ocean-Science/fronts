@@ -95,7 +95,8 @@ def preproc_super(extract_file:str, debug:bool=False):
 
 
     #extract_dict = {'fields': ['SSS'],
-    extract_dict = {'fields': ['SST','SSS'],
+    extract_dict = {'fields': ['divb'],
+    #extract_dict = {'fields': ['SST','SSS'],
              'field_size': 64,
              'pdicts': 
                  {
@@ -124,6 +125,14 @@ def preproc_super(extract_file:str, debug:bool=False):
                         "median": False,
                         "only_inpaint": False
                         }
+                    ,
+                     'divb': 
+                        {
+                        'fixed_km': 144.,
+                        'field_size': 64,
+                        'dx': 144./64,
+                        }
+                    ,
                  }
              }
 

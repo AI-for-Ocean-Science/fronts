@@ -15,6 +15,7 @@ from sklearn.utils import shuffle
 #from ulmo import io as ulmo_io
 
 from fronts.tables import defs
+from fronts.utils import stats as front_stats
 
 from IPython import embed
 
@@ -165,7 +166,7 @@ def preproc_field(field, mask, inpaint=True, median=True, med_size=(3,1),
         Pre-processed field, mean temperature
 
     """
-    meta_dict = {}
+
     # Inpaint?
     if inpaint:
         if mask.dtype.name != 'uint8':
@@ -188,21 +189,14 @@ def preproc_field(field, mask, inpaint=True, median=True, med_size=(3,1),
     if fixed_km is not None:
         field = resize_local_mean(field, (field_size, field_size))
 
-    # Capture more metadata
-    srt = np.argsort(field.flatten())
-    meta_dict['max'] = field.flatten()[srt[-1]]
-    meta_dict['min'] = field.flatten()[srt[0]]
-    i10 = int(0.1*field.size)
-    i90 = int(0.9*field.size)
-    meta_dict['10'] = field.flatten()[srt[i10]]
-    meta_dict['90'] = field.flatten()[srt[i90]]
+    # Capture metadata
+    meta_dict = front_stats.meta_stats(field)
 
     # Add noise?
     if noise is not None:
         field += np.random.normal(loc=0., 
                                   scale=noise, 
                                   size=field.shape)
-
     # Median
     if median:
         field = median_filter(field, size=med_size)
@@ -216,9 +210,7 @@ def preproc_field(field, mask, inpaint=True, median=True, med_size=(3,1),
         return None, None
 
     # Check mean
-    mu = np.mean(field)
-    meta_dict['mu'] = mu
-    if min_mean is not None and mu < min_mean:
+    if min_mean is not None and meta_dict['mu'] < min_mean:
         return None, None
 
     # De-mean the field

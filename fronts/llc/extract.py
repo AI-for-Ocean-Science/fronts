@@ -11,6 +11,7 @@ from tqdm import tqdm
 from fronts.llc import io as llc_io
 from fronts.preproc import process
 from fronts.tables import catalog
+from fronts.po import fronts as po_fronts
 
 from IPython import embed
 
@@ -54,7 +55,10 @@ def preproc_field(llc_table:pandas.DataFrame,
         km_deg = circum / 360.
     
     # Setup for parallel
-    map_fn = partial(process.preproc_image, pdict=pdict)
+    if field in ['SST','SSS']:
+        map_fn = partial(process.preproc_image, pdict=pdict)
+    elif field in ['SST','SSS']:
+        map_fn = partial(po_fronts.anly_cutout, **pdict)
 
     # Setup for dates
     uni_date = np.unique(llc_table.datetime)
