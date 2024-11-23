@@ -194,7 +194,8 @@ def main(flg:str):
 
     # Generate the Super Preproc File
     if flg == 2:
-        preproc_super('dummy_file.json', debug=True)
+        #preproc_super('dummy_file.json', debug=True)
+        preproc_super('llc4320_sst144_sss40_proto.json')#, debug=True)
 
 # Command line execution
 if __name__ == '__main__':
