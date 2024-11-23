@@ -67,6 +67,8 @@ def preproc_image(item:tuple, pdict:dict, use_mask=False,
 
     """
     # Unpack
+    mask = None
+    smooth_pix = None
     if use_mask:
         field, mask, idx = item
         if inpainted_mask:
@@ -75,16 +77,18 @@ def preproc_image(item:tuple, pdict:dict, use_mask=False,
             field[true_mask] = mask[true_mask]
             # Overwrite
             mask = true_mask
+    elif 'smooth_km' in pdict.keys():
+        field, idx, smooth_pix = item
     else:
         field, idx = item
-        mask = None
 
     # Junk field?  (e.g. LLC)
     if field is None:
         return None, idx, None
 
     # Run
-    pp_field, meta = preproc_field(field, mask, **pdict)
+    pp_field, meta = preproc_field(field, mask, 
+                                   smooth_pix=smooth_pix, **pdict)
 
     # Failed?
     if pp_field is None:
@@ -95,25 +99,28 @@ def preproc_image(item:tuple, pdict:dict, use_mask=False,
 
 
 def preproc_field(field, mask, inpaint=True, median=True, med_size=(3,1),
-                  downscale=True, dscale_size=(2,2), sigmoid=False, scale=None,
+                  downscale=True, dscale_size=(2,2), sigmoid=False, 
+                  scale=None,
                   expon=None, only_inpaint=False, gradient=False,
                   min_mean=None, de_mean=True,
                   field_size:int=None,
                   fixed_km=None,
+                  smooth_pix:int=None,
                   noise=None,
                   log_scale=False, **kwargs):
     """
     Preprocess an input field image with a series of steps:
         1. Inpainting
-        2. Resize based on fixed_km (LLC)
-        3. Add noise
-        4. Median
-        5. Downscale
-        6. Sigmoid
-        7. Scale
-        8. Remove mean
-        9. Sobel
-        10. Log
+        2. Gaussian Smooth
+        3. Resize based on fixed_km (LLC)
+        4. Add noise
+        5. Median
+        6. Downscale
+        7. Sigmoid
+        8. Scale
+        9. Remove mean
+        10. Sobel
+        11. Log
 
     Parameters
     ----------
@@ -123,6 +130,8 @@ def preproc_field(field, mask, inpaint=True, median=True, med_size=(3,1),
         Required for inpainting but otherwise ignored
     inpaint : bool, optional
         if True, inpaint masked values
+    smoooth_pix : int, optional
+        Smooth the field with a Gaussian filter of this size
     median : bool, optional
         If True, apply a median filter
     med_size : tuple
@@ -169,6 +178,16 @@ def preproc_field(field, mask, inpaint=True, median=True, med_size=(3,1),
         else:
             return field, None
 
+    # Smooth?
+    if smooth_pix is not None:
+        field = filters.gaussian(field, smooth_pix)
+        # Crop
+        field = field[2*smooth_pix:-2*smooth_pix, 2*smooth_pix:-2*smooth_pix]
+
+    # Resize?
+    if fixed_km is not None:
+        field = resize_local_mean(field, (field_size, field_size))
+
     # Capture more metadata
     srt = np.argsort(field.flatten())
     meta_dict['max'] = field.flatten()[srt[-1]]
@@ -177,10 +196,6 @@ def preproc_field(field, mask, inpaint=True, median=True, med_size=(3,1),
     i90 = int(0.9*field.size)
     meta_dict['10'] = field.flatten()[srt[i10]]
     meta_dict['90'] = field.flatten()[srt[i90]]
-
-    # Resize?
-    if fixed_km is not None:
-        field = resize_local_mean(field, (field_size, field_size))
 
     # Add noise?
     if noise is not None:

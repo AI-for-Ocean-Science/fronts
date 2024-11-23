@@ -115,10 +115,12 @@ def preproc_super(extract_file:str, debug:bool=False):
                         {
                         'fixed_km': 144.,
                         'field_size': 64,
+                        'smooth_km': 40., 
                         "quality_thresh": 2,
                         "nrepeat": 1,
                         "downscale": False,
                         "inpaint": False,
+                        "de_mean": False,
                         "median": False,
                         "only_inpaint": False
                         }
@@ -139,15 +141,18 @@ def preproc_super(extract_file:str, debug:bool=False):
             llc_table, field, extract_dict['pdicts'][field],
             fixed_km=extract_dict['pdicts'][field]['fixed_km'],
             n_cores=10, dlocal=True,
-            test_failures=False)
+            test_failures=False,
+            test_process=False)
 
-        # Write
-        f.create_dataset(field, data=np.array(pp_fields).astype(np.float32))
+        # Write data
+        pp_fields = np.array(pp_fields).astype(np.float32)
+        f.create_dataset(field, data=pp_fields)
+
         # Add meta
         for key in meta.keys():
             llc_table[field+key] = meta[key]
 
-        # Failures?
+        # Deal with failures in Table
         if np.any(~success):
             print(f"Failed to preprocess some {field} fields")
             fail = np.where(~success)[0]
@@ -155,7 +160,10 @@ def preproc_super(extract_file:str, debug:bool=False):
         # Good
         good = success & (llc_table['pp_type'] != -999)
         llc_table.loc[np.where(good)[0],'pp_type'] = 0
+        #
+        del pp_fields
 
+    # Close
     f.close()    
 
     # Write table

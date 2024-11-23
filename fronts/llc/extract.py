@@ -23,6 +23,7 @@ def preproc_field(llc_table:pandas.DataFrame,
                   dlocal:bool=True,
                   override_RAM=False,
                   test_failures:bool=False,
+                  test_process:bool=False,
                   debug=False):
     """Main routine to extract and pre-process LLC data for later SST analysis
     The llc_table is modified in place (and also returned).
@@ -89,7 +90,7 @@ def preproc_field(llc_table:pandas.DataFrame,
         llc_table.loc[gd_date, 'filename'] = filename
 
         # Load up the cutouts
-        fields = []
+        fields, smooth_pixs = [], []
         for r, c in zip(coord_tbl.row, coord_tbl.col):
             if fixed_km is None:
                 dr = field_size[0]
@@ -99,18 +100,47 @@ def preproc_field(llc_table:pandas.DataFrame,
                 dr = int(np.round(fixed_km / dlat_km))
                 dc = dr
             # Deal with smoothing
-            if 'smooth' in pdict.keys():
-                embed(header='preproc_field 102')
-            #
-            if (r+dr >= data.shape[0]) or (c+dc > data.shape[1]):
+            if 'smooth_km' in pdict.keys():
+                smooth_pix = int(np.round(pdict['smooth_km'] / dlat_km))
+                pad = 2*smooth_pix
+                #
+                use_r = r - pad
+                dr += 2*pad
+                use_c = c - pad
+                dc += 2*pad
+                smooth_pixs.append(smooth_pix)
+            else:
+                use_r, use_c = r, c
+            # Off the image?
+            if (r+dr >= data.shape[0]) or (c+dc > data.shape[1]) or (
+                use_r < 0) or (use_c < 0):
                 fields.append(None)
             else:
-                fields.append(data[r:r+dr, c:c+dc])
+                fields.append(data[use_r:use_r+dr, use_c:use_c+dc])
         print("Cutouts loaded for {}".format(filename))
 
-        # Multi-process time
-        items = [item for item in zip(fields,sub_idx)]
+        # Prep items
+        if 'smooth_km' in pdict.keys():
+            myzip = zip(fields, sub_idx, smooth_pixs)
+        else:
+            myzip = zip(fields, sub_idx)
+        items = [item for item in myzip]
 
+        # Test processing
+        if test_process:
+            idx = 75
+            img, tmeta = process.preproc_field(fields[idx], None,
+                                  smooth_pix=smooth_pixs[idx], 
+                                  **pdict)
+            # 
+            from matplotlib import pyplot as plt
+            fig = plt.figure(figsize=(8,8))
+            plt.clf()
+            plt.imshow(img, origin='lower')
+            plt.show()
+            embed(header='extract.py/preproc_field 130')
+
+        # Multi-process time
         with ProcessPoolExecutor(max_workers=n_cores) as executor:
             chunksize = len(items) // n_cores if len(items) // n_cores > 0 else 1
             answers = list(tqdm(executor.map(map_fn, items,
