@@ -26,7 +26,7 @@ from fronts import io as fronts_io
 from IPython import embed
 
 local_out_path = os.path.join(os.getenv('OS_OGCM'), 'LLC', 'Fronts')
-super_tbl_file = os.path.join(local_out_path, 'LLC4320_SST144_SSS40_super_test.parquet')
+super_tbl_file = os.path.join(local_out_path, 'LLC4320_SST144_SSS40_super.parquet')
 super_preproc_file = os.path.join(local_out_path, 'LLC4320_SST144_SSS40_super.h5')
 
 def generate_super_table(debug=False, resol=0.5, plot=False,
@@ -151,7 +151,7 @@ def preproc_super(extract_file:str, debug:bool=False):
             fixed_km=extract_dict['pdicts'][field]['fixed_km'],
             n_cores=10, dlocal=True,
             test_failures=False,
-            test_process=False)
+            test_process=False, override_RAM=True)
 
         # Write data
         pp_fields = np.array(pp_fields).astype(np.float32)
@@ -178,11 +178,11 @@ def preproc_super(extract_file:str, debug:bool=False):
     # Write table
     assert catalog.vet_main_table(llc_table)
     if not debug:
-        fronts_io.write_main_table(llc_table, tbl_file, to_s3=False)
+        fronts_io.write_main_table(llc_table, super_tbl_file, to_s3=False)
     else:
-        tbl_file = os.path.join(local_out_path, 'LLC4320_SST144_SSS40_super_test.parquet')
-        fronts_io.write_main_table(llc_table, tbl_file, to_s3=False)
         embed(header='preproc_super 118')
+        tbl_file = os.path.join(local_out_path, 'blah')
+        fronts_io.write_main_table(llc_table, tbl_file, to_s3=False)
 
 
 def main(flg:str):
@@ -195,7 +195,8 @@ def main(flg:str):
     # Generate the Super Preproc File
     if flg == 2:
         #preproc_super('dummy_file.json', debug=True)
-        preproc_super('llc4320_sst144_sss40_proto.json')#, debug=True)
+        json_file = 'llc4320_sst144_sss40_extract.json'
+        preproc_super(json_file)
 
 # Command line execution
 if __name__ == '__main__':
