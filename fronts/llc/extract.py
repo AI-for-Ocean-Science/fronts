@@ -55,10 +55,12 @@ def preproc_field(llc_table:pandas.DataFrame,
         km_deg = circum / 360.
     
     # Setup for parallel
-    if field in ['SST','SSS']:
+    if field in ['SST','SSS','DivSST2']:
         map_fn = partial(process.preproc_image, pdict=pdict)
     elif field in ['Divb2']:
         map_fn = partial(po_fronts.anly_cutout, **pdict)
+    else:
+        raise IOError(f"Not ready for this field {field}")
 
     # Setup for dates
     uni_date = np.unique(llc_table.datetime)
@@ -78,8 +80,10 @@ def preproc_field(llc_table:pandas.DataFrame,
         ds = llc_io.load_llc_ds(filename, local=dlocal)
 
         # Field
-        if field == 'SST':
+        if field in ['SST', 'DivSST2', 'SSTK']:
             data = ds.Theta.values
+            if field == 'SSTK':
+                data += 273.15 # Kelvin
         elif field == 'SSS':
             data = ds.Salt.values
         elif field == 'Divb2':
@@ -140,8 +144,11 @@ def preproc_field(llc_table:pandas.DataFrame,
 
         # Test processing
         if test_process:
-            idx = 75
-            img, iidx, tmeta = po_fronts.anly_cutout(items[idx], **pdict)
+            embed(header='extract.py/preproc_field 145')
+            idx = 50
+            img, tmeta = process.preproc_field(fields[idx], None, **pdict)
+            #img, iidx, tmeta = po_fronts.anly_cutout(
+            #    items[idx], **pdict)
             '''
             # Smoothing
             img, tmeta = process.preproc_field(fields[idx], None,
@@ -154,7 +161,6 @@ def preproc_field(llc_table:pandas.DataFrame,
             plt.clf()
             plt.imshow(img, origin='lower')
             plt.show()
-            embed(header='extract.py/preproc_field 130')
 
         # Multi-process time
         with ProcessPoolExecutor(max_workers=n_cores) as executor:

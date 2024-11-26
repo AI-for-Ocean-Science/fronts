@@ -16,6 +16,7 @@ from sklearn.utils import shuffle
 
 from fronts.tables import defs
 from fronts.utils import stats as front_stats
+from fronts.po import utils as po_utils
 
 from IPython import embed
 
@@ -99,10 +100,11 @@ def preproc_image(item:tuple, pdict:dict, use_mask=False,
     return pp_field.astype(np.float32), idx, meta
 
 
-def preproc_field(field, mask, inpaint=True, median=True, med_size=(3,1),
-                  downscale=True, dscale_size=(2,2), sigmoid=False, 
+def preproc_field(field, mask, inpaint=False, median=False, med_size=(3,1),
+                  downscale=False, dscale_size=(2,2), sigmoid=False, 
                   scale=None,
                   expon=None, only_inpaint=False, gradient=False,
+                  div2:float=None,
                   min_mean=None, de_mean=True,
                   field_size:int=None,
                   fixed_km=None,
@@ -149,6 +151,9 @@ def preproc_field(field, mask, inpaint=True, median=True, med_size=(3,1),
         Exponate the SSTa values by this exponent
     gradient : bool, optional
         If True, apply a Sobel gradient enhancing filter
+    div2 : float, optional
+        If provided, calculate the squared divergence and use
+        div2 as the length (i.e. dx)
     de_mean : bool, optional
         If True, subtract the mean
     min_mean : float, optional
@@ -244,6 +249,10 @@ def preproc_field(field, mask, inpaint=True, median=True, med_size=(3,1),
         meta_dict['G10'] = pp_field.flatten()[srt[i10]]
         meta_dict['G90'] = pp_field.flatten()[srt[i90]]
         meta_dict['Gmax'] = pp_field.flatten()[srt[-1]]
+
+    # |grad f|^2?
+    if div2 is not None:
+        pp_field = po_utils.calc_grad2(pp_field, div2)
 
     # Log?
     if log_scale:

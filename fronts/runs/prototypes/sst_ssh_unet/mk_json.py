@@ -43,7 +43,7 @@ def main():
             }
     json_file = 'llc4320_sst144_sss40_extract.json'
     utils_io.savejson('llc4320_sst144_sss40_extract.json', 
-                      extract_dict, overwrite=True)
+                      extract_dict, overwrite=True, easy_to_read=True)
     print(f'Saved {json_file}')
 
 # Command line execution

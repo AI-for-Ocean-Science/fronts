@@ -1,6 +1,7 @@
 """ Module to generate a prototype for the SST-SSH U-Net with
 LLC4320 data """
 
+from importlib import reload
 
 import os
 import numpy as np
@@ -20,6 +21,7 @@ from fronts.tables import catalog
 from fronts import io as fronts_io
 from fronts.po import fronts
 from fronts.plotting import images
+from fronts.train import tables as train_tables
 
 from IPython import embed
 
@@ -182,6 +184,63 @@ def preproc_super(extract_file:str, debug:bool=False):
         tbl_file = os.path.join(local_out_path, 'blah')
         fronts_io.write_main_table(llc_table, tbl_file, to_s3=False)
 
+def gen_trainvalid(trainfile_config:str, debug:bool=False):
+
+    # Load
+    llc_table = pandas.read_parquet(super_tbl_file)
+
+    # Cut down
+    llc_table = llc_table[llc_table.pp_type == 0].copy()
+    
+    with open(trainfile_config, 'r') as infile:
+        config_dict = json.load(infile)
+
+    # Datset
+    if config_dict['dataset'] != 'LLC4320':
+        raise ValueError("Only LLC4320 supported")
+
+    # Generate the tables
+    #embed(header='194 of llc4320_sst_ssh_proto.py')
+    #reload(train_tables)
+    train_tbl, valid_tbl, test_tbl = train_tables.tvt(
+        llc_table, config_dict)
+
+    ninputs = len(config_dict['inputs'].keys())
+    field_size = config_dict['field_size']
+
+    # Process me
+    for froot, tbl in zip(['train', 'valid', 'test'], 
+                          [train_tbl, valid_tbl, test_tbl]):
+
+        # Debug?
+        if debug:
+            tbl = tbl.iloc[:20].copy()
+
+        # Inputs first
+        if config_dict['format'] == 'unet3d':
+            darray = np.zeros((len(tbl), ninputs, 1, field_size, field_size), dtype=np.float32)
+        else:
+            raise ValueError("Bad format")
+        #embed(header='220 of llc4320_sst_ssh_proto.py')
+        for nchannel, field in enumerate(config_dict['inputs'].keys()):
+            print(f"Working on {field}")
+            # Make sure we have the right field_size
+            config_dict['inputs'][field]['field_size'] = field_size
+            # Preprocess
+            tbl, success, pp_fields, meta = extract.preproc_field(
+                tbl, field, config_dict['inputs'][field],
+                fixed_km=config_dict['inputs'][field]['fixed_km'],
+                n_cores=10, dlocal=True,
+                test_failures=False,
+                test_process=False, override_RAM=True)
+
+            if np.any(~success):
+                embed(header='Not all successful!')
+
+            # Fill in
+            darray[:,nchannel,0,:,:] = pp_fields
+
+
 
 # #######################################################33
 def gallery(data_file:str=None, tbl_file:str=None,
@@ -256,6 +315,11 @@ def main(flg:str):
         #preproc_super('dummy_file.json', debug=True)
         json_file = 'llc4320_sst144_sss40_extract.json'
         preproc_super(json_file)
+
+    # Generate the Super Preproc File
+    if flg == 3:
+        json_file = 'llc4320_sst144_sss40_tvfile.json'
+        gen_trainvalid(json_file, debug=True)
 
     # Examine a set of images
     if flg == 10:

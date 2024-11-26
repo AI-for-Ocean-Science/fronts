@@ -4,6 +4,7 @@ from skimage.transform import resize_local_mean
 
 
 from fronts.utils import stats as front_stats
+from fronts.po import utils as po_utils
 
 try:
     from gsw import density
@@ -65,11 +66,4 @@ def calc_gradb(Theta:np.ndarray, Salt:np.ndarray,
     rho = density.rho(Salt, Theta, np.zeros_like(Salt))
     b = g*rho/ref_rho
 
-    # Gradient
-    dbdx = -1*np.gradient(b, axis=1) / dx
-    dbdy = -1*np.gradient(b, axis=0) / dx
-
-    # Magnitude
-    grad_b2 = dbdx**2 + dbdy**2
-
-    return grad_b2
+    return calc_grad2(b, dx)

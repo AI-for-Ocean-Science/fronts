@@ -1,1 +1,37 @@
-{"fields": ["SST", "SSS", "Divb2"], "field_size": 64, "pdicts": {"SST": {"fixed_km": 144.0, "field_size": 64, "quality_thresh": 2, "nrepeat": 1, "downscale": false, "inpaint": false, "median": false, "only_inpaint": false}, "SSS": {"fixed_km": 144.0, "field_size": 64, "smooth_km": 40.0, "quality_thresh": 2, "nrepeat": 1, "downscale": false, "inpaint": false, "de_mean": false, "median": false, "only_inpaint": false}, "Divb2": {"fixed_km": 144.0, "field_size": 64, "dx": 2.25}}}
+{
+    "field_size": 64,
+    "fields": [
+        "SST",
+        "SSS",
+        "Divb2"
+    ],
+    "pdicts": {
+        "Divb2": {
+            "dx": 2.25,
+            "field_size": 64,
+            "fixed_km": 144.0
+        },
+        "SSS": {
+            "de_mean": false,
+            "downscale": false,
+            "field_size": 64,
+            "fixed_km": 144.0,
+            "inpaint": false,
+            "median": false,
+            "nrepeat": 1,
+            "only_inpaint": false,
+            "quality_thresh": 2,
+            "smooth_km": 40.0
+        },
+        "SST": {
+            "downscale": false,
+            "field_size": 64,
+            "fixed_km": 144.0,
+            "inpaint": false,
+            "median": false,
+            "nrepeat": 1,
+            "only_inpaint": false,
+            "quality_thresh": 2
+        }
+    }
+}
