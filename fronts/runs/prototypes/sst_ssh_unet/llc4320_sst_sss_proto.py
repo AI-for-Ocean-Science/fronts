@@ -184,7 +184,7 @@ def preproc_super(extract_file:str, debug:bool=False):
         tbl_file = os.path.join(local_out_path, 'blah')
         fronts_io.write_main_table(llc_table, tbl_file, to_s3=False)
 
-def gen_trainvalid(trainfile_config:str, debug:bool=False):
+def gen_trainvalid(trainfile_config:str, outroot:str, debug:bool=False):
 
     # Load
     llc_table = pandas.read_parquet(super_tbl_file)
@@ -205,42 +205,62 @@ def gen_trainvalid(trainfile_config:str, debug:bool=False):
     train_tbl, valid_tbl, test_tbl = train_tables.tvt(
         llc_table, config_dict)
 
-    ninputs = len(config_dict['inputs'].keys())
     field_size = config_dict['field_size']
 
     # Process me
     for froot, tbl in zip(['train', 'valid', 'test'], 
                           [train_tbl, valid_tbl, test_tbl]):
 
+        # Open HDF5 file
+        outfile = os.path.join(local_out_path, f'{outroot}_{froot}.h5')
+        f = h5py.File(outfile, 'w')
+
         # Debug?
         if debug:
-            tbl = tbl.iloc[:20].copy()
+            tbl = tbl.iloc[:5].copy()
 
-        # Inputs first
-        if config_dict['format'] == 'unet3d':
-            darray = np.zeros((len(tbl), ninputs, 1, field_size, field_size), dtype=np.float32)
-        else:
-            raise ValueError("Bad format")
-        #embed(header='220 of llc4320_sst_ssh_proto.py')
-        for nchannel, field in enumerate(config_dict['inputs'].keys()):
-            print(f"Working on {field}")
-            # Make sure we have the right field_size
-            config_dict['inputs'][field]['field_size'] = field_size
-            # Preprocess
-            tbl, success, pp_fields, meta = extract.preproc_field(
-                tbl, field, config_dict['inputs'][field],
-                fixed_km=config_dict['inputs'][field]['fixed_km'],
-                n_cores=10, dlocal=True,
-                test_failures=False,
-                test_process=False, override_RAM=True)
+        # Loop on Inputs and Targets
+        for ftype in ['inputs', 'targets']:
+            if debug and ftype == 'inputs':
+                continue
+            ntype = len(config_dict[ftype].keys())
+            # Data array
+            if config_dict['format'] == 'unet3d':
+                darray = np.zeros((len(tbl), ntype, 1, field_size, field_size), dtype=np.float32)
+            else:
+                raise ValueError("Bad format")
+            
+            for nchannel, field in enumerate(config_dict[ftype].keys()):
+                print(f"Working on {field} for {ftype}")
+                # Make sure we have the right field_size
+                config_dict[ftype][field]['field_size'] = field_size
 
-            if np.any(~success):
-                embed(header='Not all successful!')
+                # Preprocess
+                tbl, success, pp_fields, meta = extract.preproc_field(
+                    tbl, field, config_dict[ftype][field],
+                    fixed_km=config_dict[ftype][field]['fixed_km'],
+                    n_cores=10, dlocal=True,
+                    test_failures=False,
+                    test_process=False, override_RAM=True)
 
-            # Fill in
-            darray[:,nchannel,0,:,:] = pp_fields
+                if np.any(~success):
+                    embed(header='Not all successful!')
 
+                # Threshold?
+                if ftype == 'targets' and 'threshold' in config_dict[ftype][field].keys():
+                    # THIS IS WRONG IF WE HAVE MULTIPLE THRESHOLDS
+                    pp_fields = (pp_fields > config_dict[ftype][field]['threshold']).astype(np.float32)
 
+                # Fill in
+                darray[:,nchannel,0,:,:] = pp_fields
+            # Write inputs
+            f.create_dataset(ftype, data=darray)
+
+        embed(header='242 of llc4320_sst_ssh_proto.py')
+
+        # Close it
+        f.close()
+        print(f"Wrote: {outfile}")
 
 # #######################################################33
 def gallery(data_file:str=None, tbl_file:str=None,
@@ -319,7 +339,7 @@ def main(flg:str):
     # Generate the Super Preproc File
     if flg == 3:
         json_file = 'llc4320_sst144_sss40_tvfile.json'
-        gen_trainvalid(json_file, debug=True)
+        gen_trainvalid(json_file, 'LLC4320_SST144_SSS40', debug=True)
 
     # Examine a set of images
     if flg == 10:

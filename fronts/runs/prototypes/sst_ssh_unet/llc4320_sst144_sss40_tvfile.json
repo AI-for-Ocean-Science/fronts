@@ -11,7 +11,6 @@
             "dx": 2.25,
             "field_size": 64,
             "fixed_km": 144.0,
-            "inpaint": false,
             "de_mean": false,
             "div2": 2.25
         },
@@ -20,30 +19,24 @@
             "downscale": false,
             "field_size": 64,
             "fixed_km": 144.0,
-            "inpaint": false,
-            "median": false,
-            "only_inpaint": false,
             "smooth_km": 40.0
         },
         "SSTK": {
             "de_mean": false,
             "downscale": false,
             "field_size": 64,
-            "fixed_km": 144.0,
-            "inpaint": false,
-            "median": false,
-            "only_inpaint": false
+            "fixed_km": 144.0
         }
     },
-    "labels": {
+    "ntest": 100,
+    "ntrain": 1000,
+    "nvalid": 200,
+    "targets": {
         "Divb2": {
             "dx": 2.25,
             "field_size": 64,
             "fixed_km": 144.0,
             "threshold": 1e-14
         }
-    },
-    "ntest": 100,
-    "ntrain": 1000,
-    "nvalid": 200
+    }
 }

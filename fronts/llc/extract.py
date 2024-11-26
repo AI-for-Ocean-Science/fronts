@@ -55,7 +55,7 @@ def preproc_field(llc_table:pandas.DataFrame,
         km_deg = circum / 360.
     
     # Setup for parallel
-    if field in ['SST','SSS','DivSST2']:
+    if field in ['SST','SSS','DivSST2','SSTK']:
         map_fn = partial(process.preproc_image, pdict=pdict)
     elif field in ['Divb2']:
         map_fn = partial(po_fronts.anly_cutout, **pdict)

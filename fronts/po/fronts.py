@@ -13,7 +13,7 @@ except ImportError:
 
 
 def anly_cutout(item:tuple, fixed_km:float=None, field_size:int=None, 
-                dx:float=None):
+                dx:float=None, **kwargs):
     """Simple function to measure front related stats
     for a cutout
     
@@ -66,4 +66,4 @@ def calc_gradb(Theta:np.ndarray, Salt:np.ndarray,
     rho = density.rho(Salt, Theta, np.zeros_like(Salt))
     b = g*rho/ref_rho
 
-    return calc_grad2(b, dx)
+    return po_utils.calc_grad2(b, dx)
