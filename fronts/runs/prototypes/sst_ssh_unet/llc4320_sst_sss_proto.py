@@ -18,7 +18,8 @@ from fronts.llc import extract
 from fronts.preproc import process
 from fronts.tables import catalog
 from fronts import io as fronts_io
-from fronts.utils import plotting
+from fronts.po import fronts
+from fronts.plotting import images
 
 from IPython import embed
 
@@ -203,7 +204,7 @@ def gallery(data_file:str=None, tbl_file:str=None,
     f = h5py.File(data_file, 'r')
 
     # Figure
-    fig = plt.figure(figsize=(12, 4))
+    fig = plt.figure(figsize=(5, 12))
     gs = gridspec.GridSpec(5,4)
 
     for row, perc in enumerate([1,5,50,95,99]):
@@ -214,21 +215,33 @@ def gallery(data_file:str=None, tbl_file:str=None,
         ax0 = plt.subplot(gs[row,0])
         ax1 = plt.subplot(gs[row,1])
         ax2 = plt.subplot(gs[row,2])
+        ax3 = plt.subplot(gs[row,3])
 
         # Get the data
-        sst = f['SST'][idx]
+        ssta = f['SST'][idx]
         sss = f['SSS'][idx]
         Divb2 = f['Divb2'][idx]
 
         # Plot the 3 easy ones
-        plotting.show_image(sst, clbl='SST (deg C)', ax=ax0)
-        plotting.show_image(sss, clbl='SSS (psu)', cm='viridis', ax=ax1)
-        plotting.show_image(Divb2, clbl=r'$\nabla b^2$', cm='Greys', ax=ax2)
+        images.show_image(ssta, clbl='SSTa (deg C)', ax=ax0)
+        images.show_image(sss, clbl='SSS (psu)', cm='viridis', ax=ax1)
+
+        vmnx = (Divb2.min(), Divb2.max())
+        images.show_image(Divb2, clbl=r'$\nabla b^2$', cm='Greys', 
+                          ax=ax2, vmnx=vmnx)
+
+        # Calculate divb2 from the smoothed sss
+        sst = ssta + front_tbl['SSTmu'][ii]
+        smooth_Divb2 = fronts.calc_gradb(
+            sst, sss, dx=144./64)
+        images.show_image(smooth_Divb2, clbl=r'Smooth $\nabla b^2$', 
+                          cm='Greys', ax=ax3, vmnx=vmnx)
 
 
     plt.tight_layout(pad=0.5, h_pad=0.5, w_pad=0.5)
     plt.savefig(outfile, dpi=300)
     plt.close()
+    print("Wrote: ", outfile)
 
 # #######################################################33
 def main(flg:str):
