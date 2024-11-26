@@ -221,10 +221,11 @@ def gen_trainvalid(trainfile_config:str, outroot:str, debug:bool=False):
 
         # Loop on Inputs and Targets
         for ftype in ['inputs', 'targets']:
-            if debug and ftype == 'inputs':
-                continue
-            ntype = len(config_dict[ftype].keys())
+            #if debug and ftype == 'inputs':
+            #    continue
+
             # Data array
+            ntype = len(config_dict[ftype].keys())
             if config_dict['format'] == 'unet3d':
                 darray = np.zeros((len(tbl), ntype, 1, field_size, field_size), dtype=np.float32)
             else:
@@ -254,9 +255,8 @@ def gen_trainvalid(trainfile_config:str, outroot:str, debug:bool=False):
                 # Fill in
                 darray[:,nchannel,0,:,:] = pp_fields
             # Write inputs
-            f.create_dataset(ftype, data=darray)
-
-        embed(header='242 of llc4320_sst_ssh_proto.py')
+            dset = f.create_dataset(ftype, data=darray)
+            dset.attrs['fields'] = list(config_dict[ftype].keys())
 
         # Close it
         f.close()
