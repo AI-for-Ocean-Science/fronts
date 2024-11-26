@@ -197,7 +197,7 @@ def gallery(data_file:str=None, tbl_file:str=None,
     keep = tbl.pp_type == 0
     front_tbl = tbl[keep].copy()
 
-    srt = np.argsort(front_tbl['Divb2mu'])
+    srt = np.argsort(front_tbl['Divb2mu'].values)
 
     # Images
     f = h5py.File(data_file, 'r')
@@ -207,6 +207,7 @@ def gallery(data_file:str=None, tbl_file:str=None,
     gs = gridspec.GridSpec(5,4)
 
     for row, perc in enumerate([1,5,50,95,99]):
+        print("Working on row: ", row)
         ii = srt[int(perc/100*len(srt))]
         idx = front_tbl.index[ii]
 
