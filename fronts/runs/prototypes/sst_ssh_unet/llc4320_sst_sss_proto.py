@@ -231,7 +231,7 @@ def gallery(data_file:str=None, tbl_file:str=None,
                           ax=ax2, vmnx=vmnx)
 
         # Calculate divb2 from the smoothed sss
-        sst = ssta + front_tbl['SSTmu'][ii]
+        sst = ssta + front_tbl['SSTmu'].values[ii]
         smooth_Divb2 = fronts.calc_gradb(
             sst, sss, dx=144./64)
         images.show_image(smooth_Divb2, clbl=r'Smooth $\nabla b^2$', 
