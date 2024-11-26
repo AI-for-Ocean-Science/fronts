@@ -204,7 +204,7 @@ def gallery(data_file:str=None, tbl_file:str=None,
     f = h5py.File(data_file, 'r')
 
     # Figure
-    fig = plt.figure(figsize=(5, 12))
+    fig = plt.figure(figsize=(12, 12))
     gs = gridspec.GridSpec(5,4)
 
     for row, perc in enumerate([1,5,50,95,99]):
