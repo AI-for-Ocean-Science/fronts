@@ -191,6 +191,7 @@ def gallery(data_file:str=None, tbl_file:str=None,
         tbl_file = super_tbl_file
 
     # Load the table
+    print(f"Loading table: {tbl_file}")
     tbl = pandas.read_parquet(tbl_file)
     # Cut down to good ones
     keep = tbl.pp_type == 0
@@ -206,7 +207,8 @@ def gallery(data_file:str=None, tbl_file:str=None,
     gs = gridspec.GridSpec(5,4)
 
     for row, perc in enumerate([1,5,50,95,99]):
-        idx = srt[int(perc/100*len(srt))]
+        ii = srt[int(perc/100*len(srt))]
+        embed(header='211 of gallery')
 
         ax0 = plt.subplot(gs[row,0])
         ax1 = plt.subplot(gs[row,1])
