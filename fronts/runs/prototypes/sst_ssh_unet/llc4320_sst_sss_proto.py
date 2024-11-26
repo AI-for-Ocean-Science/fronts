@@ -10,18 +10,15 @@ import xarray
 import json
 import h5py
 
-#from ulmo.llc import extract 
-#from ulmo.llc import uniform
-#from ulmo import io as ulmo_io
-#from ulmo.analysis import evaluate as ulmo_evaluate
-#from ulmo.nflows import nn 
-#from ulmo.preproc import plotting as pp_plotting
+from matplotlib import pyplot as plt
+import matplotlib.gridspec as gridspec
 
 from fronts.llc import table
 from fronts.llc import extract
 from fronts.preproc import process
 from fronts.tables import catalog
 from fronts import io as fronts_io
+from fronts.utils import plotting
 
 from IPython import embed
 
@@ -185,6 +182,52 @@ def preproc_super(extract_file:str, debug:bool=False):
         fronts_io.write_main_table(llc_table, tbl_file, to_s3=False)
 
 
+# #######################################################33
+def gallery(data_file:str=None, tbl_file:str=None,
+            outfile:str='fig_gallery.png'):
+    if data_file is None:
+        data_file = super_preproc_file
+    if tbl_file is None:
+        tbl_file = super_tbl_file
+
+    # Load the table
+    tbl = pandas.read_parquet(tbl_file)
+    # Cut down to good ones
+    keep = tbl.pp_type == 0
+    front_tbl = tbl[keep].copy()
+
+    srt = np.argsort(front_tbl['Divb2mu'])
+
+    # Images
+    f = h5py.File(data_file, 'r')
+
+    # Figure
+    fig = plt.figure(figsize=(12, 4))
+    gs = gridspec.GridSpec(5,4)
+
+    for row, perc in enumerate([1,5,50,95,99]):
+        idx = srt[int(perc/100*len(srt))]
+
+        ax0 = plt.subplot(gs[row,0])
+        ax1 = plt.subplot(gs[row,1])
+        ax2 = plt.subplot(gs[row,2])
+
+        # Get the data
+        sst = f['SST'][idx]
+        sss = f['SSS'][idx]
+        Divb2 = f['Divb2'][idx]
+
+        # Plot the 3 easy ones
+        plotting.show_image(sst, clbl='SST (deg C)', ax=ax0)
+        plotting.show_image(sss, clbl='SSS (psu)', cm='viridis', ax=ax1)
+        plotting.show_image(Divb2, clbl=r'$\nabla b^2$', cm='Greys', ax=ax2)
+
+
+    plt.tight_layout(pad=0.5, h_pad=0.5, w_pad=0.5)
+    plt.savefig(outfile, dpi=300)
+    plt.close()
+
+# #######################################################33
 def main(flg:str):
     flg= int(flg)
 
@@ -197,6 +240,10 @@ def main(flg:str):
         #preproc_super('dummy_file.json', debug=True)
         json_file = 'llc4320_sst144_sss40_extract.json'
         preproc_super(json_file)
+
+    # Examine a set of images
+    if flg == 10:
+        gallery()
 
 # Command line execution
 if __name__ == '__main__':
