@@ -54,6 +54,7 @@ def main(pargs):
     ds = llc_io.load_llc_ds(filename, local=True)
 
     # Deal with fixed
+    print("Loading the coords...")
     coords_ds = llc_io.load_coords()
     R_earth = 6371. # km
     circum = 2 * np.pi* R_earth
@@ -92,3 +93,8 @@ def main(pargs):
             plt.show()
 
     # Save images?
+    if pargs.data_file is not None:
+        idict = {}
+        for field in fields:
+            idict[field] = images.pop(0)
+        np.savez(pargs.data_file, **idict)
