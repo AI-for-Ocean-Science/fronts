@@ -21,11 +21,10 @@ optimizer:
   weight_decay: 0.00001
 loss:
   name: DiceLoss
-  skip_last_target: true
+  skip_last_target: false
 eval_metric:
-  name: BlobsAveragePrecision
+  name: DiceCoefficient
   use_last_target: true
-  metric: 'ap'
 lr_scheduler:
   name: ReduceLROnPlateau
   mode: max
