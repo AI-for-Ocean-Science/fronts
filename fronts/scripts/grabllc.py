@@ -79,7 +79,7 @@ def main(pargs):
     if pargs.show or pargs.fig_file is not None:
         vmnx=(-5,5)
         # Plot
-        fig = plt.figure(figsize=(10, 4))
+        fig = plt.figure(figsize=(10, 3))
         #pal, cm = plotting.load_palette()
         plt.clf()
         gs = gridspec.GridSpec(1, nfields)
@@ -91,6 +91,7 @@ def main(pargs):
 
         if pargs.fig_file is not None:
             plt.savefig(pargs.fig_file, dpi=300)
+            print(f'Wrote: {pargs.fig_file}')
         if pargs.show:
             plt.show()
 
@@ -100,3 +101,4 @@ def main(pargs):
         for field in fields:
             idict[field] = images.pop(0)
         np.savez(pargs.data_file, **idict)
+        print(f'Wrote: {pargs.data_file}')
