@@ -28,8 +28,6 @@ def main(pargs):
     import numpy as np
     from matplotlib import pyplot as plt
     import matplotlib.gridspec as gridspec
-    import seaborn as sns
-
 
     from skimage.transform import resize_local_mean
 
@@ -77,7 +75,6 @@ def main(pargs):
         
     # Show?
     if pargs.show or pargs.fig_file is not None:
-        vmnx=(-5,5)
         # Plot
         fig = plt.figure(figsize=(10, 3))
         #pal, cm = plotting.load_palette()
@@ -88,6 +85,8 @@ def main(pargs):
             ax = plt.subplot(gs[ss])
             pimages.show_image(image, ax=ax, clbl=fields[ss])
             
+
+        plt.tight_layout()
 
         if pargs.fig_file is not None:
             plt.savefig(pargs.fig_file, dpi=300)
