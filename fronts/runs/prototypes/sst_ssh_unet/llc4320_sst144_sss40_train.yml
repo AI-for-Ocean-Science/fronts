@@ -8,7 +8,7 @@ model:
   final_sigmoid: true
   is_segmentation: true
 trainer:
-  checkpoint_dir: PATH_TO_CHECKPOINT_DIR
+  checkpoint_dir: /tank/xavier/Oceanography/python/fronts/fronts/runs/prototypes/sst_ssh_unet/check_points
   resume: null
   pre_trained: null
   validate_after_iters: 250
@@ -32,13 +32,20 @@ lr_scheduler:
   factor: 0.2
   patience: 30
 loaders:
-  dataset: LazyHDF5Dataset
+  dataset: XHDF5Dataset
   batch_size: 16
   num_workers: 8
+  raw_internal_path: inputs
+  label_internal_path: targets
   train:
     file_paths:
-      - PATH_TO_TRAIN_DIR
+      - /data/Projects/Oceanography/OGCM/LLC/Fronts/LLC4320_SST144_SSS40_train.h5
 
+    slice_builder:
+      name: SliceBuilder
+      patch_shape: [1, 64, 64]
+      stride_shape: [1, 64, 64]
+      skip_shape_check: true
     transformer:
       raw:
         - name: ToTensor
@@ -48,8 +55,13 @@ loaders:
           expand_dims: true
   val:
     file_paths:
-      - PATH_TO_VAL_DIR
+      - /data/Projects/Oceanography/OGCM/LLC/Fronts/LLC4320_SST144_SSS40_valid.h5
 
+    slice_builder:
+      name: SliceBuilder
+      patch_shape: [1, 64, 64]
+      stride_shape: [1, 64, 64]
+      skip_shape_check: true
     transformer:
       raw:
         - name: ToTensor

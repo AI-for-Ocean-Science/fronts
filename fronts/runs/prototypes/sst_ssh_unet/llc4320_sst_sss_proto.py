@@ -336,7 +336,7 @@ def main(flg:str):
         json_file = 'llc4320_sst144_sss40_extract.json'
         preproc_super(json_file)
 
-    # Generate the Super Preproc File
+    # Generate the Training, Validation, Test files
     if flg == 3:
         json_file = 'llc4320_sst144_sss40_tvfile.json'
         gen_trainvalid(json_file, 'LLC4320_SST144_SSS40', debug=False)
