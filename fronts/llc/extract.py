@@ -15,6 +15,27 @@ from fronts.po import fronts as po_fronts
 
 from IPython import embed
 
+def field_from_ds(ds, field:str):
+
+    if field in ['SST', 'DivSST2', 'SSTK']:
+        data = ds.Theta.values
+        if field == 'SSTK':
+            data += 273.15 # Kelvin
+    elif field == 'SSS':
+        data = ds.Salt.values
+    elif field == 'Divb2':
+        data = ds.Theta.values
+        data2 = ds.Salt.values
+    else:
+        raise IOError(f"Not ready for this field {field}")
+
+    # Return
+    if field == 'Divb2':
+        return po_fronts.calc_gradb(data, data2)
+    else:
+        return data
+
+
 def preproc_field(llc_table:pandas.DataFrame, 
                   field:str,
                   pdict:str,
@@ -91,6 +112,7 @@ def preproc_field(llc_table:pandas.DataFrame,
             data2 = ds.Salt.values
         else:
             raise IOError(f"Not ready for this field {field}")
+
         # Parse 
         gd_date = llc_table.datetime == udate
         sub_idx = np.where(gd_date)[0]

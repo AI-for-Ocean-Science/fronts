@@ -6,6 +6,10 @@ __pycache__/
 # C extensions
 *.so
 
+# Tortch
+*.pytorch
+events.out.*
+
 # Distribution / packaging
 .Python
 build/
