@@ -30,6 +30,9 @@ def main(pargs):
     import matplotlib.gridspec as gridspec
     import seaborn as sns
 
+
+    from skimage.transform import resize_local_mean
+
     import pandas
 
     from fronts.llc import io as llc_io
@@ -50,13 +53,24 @@ def main(pargs):
     filename = llc_io.grab_llc_datafile(udate, local=True)
     ds = llc_io.load_llc_ds(filename, local=True)
 
+    # Deal with fixed
+    coords_ds = llc_io.load_coords()
+    R_earth = 6371. # km
+    circum = 2 * np.pi* R_earth
+    km_deg = circum / 360.
+    dlat_km = (coords_ds.lat.data[idf.row+1,idf.col]-
+               coords_ds.lat.data[idf.row,idf.col]) * km_deg
+
     print("Loading the images...")
     images = []
     for field in fields:
         full = llc_extract.field_from_ds(ds, field)
         # Cut out
-        cutout = full[idf.row:idf.row+pargs.field_size, 
-                      idf.col:idf.col+pargs.field_size]
+        dr = int(np.round(pargs.fixed_km / dlat_km))
+        dc = dr
+        cutout = full[idf.row:idf.row+dr, idf.col:idf.col+dc]
+        cutout = resize_local_mean(cutout, (pargs.field_size, pargs.field_size))
+        # Resize
         images.append(cutout)
         
     # Show?
@@ -77,3 +91,4 @@ def main(pargs):
         if pargs.show:
             plt.show()
 
+    # Save images?
