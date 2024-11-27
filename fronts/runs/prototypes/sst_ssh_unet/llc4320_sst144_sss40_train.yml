@@ -8,7 +8,7 @@ model:
   final_sigmoid: true
   is_segmentation: true
 trainer:
-  checkpoint_dir: /tank/xavier/Oceanography/python/fronts/fronts/runs/prototypes/sst_ssh_unet/check_points
+  checkpoint_dir: /home/xavier/Projects/Oceanography/python/fronts/fronts/runs/prototypes/sst_ssh_unet/check_points
   resume: null
   pre_trained: null
   validate_after_iters: 250
@@ -38,7 +38,7 @@ loaders:
   label_internal_path: targets
   train:
     file_paths:
-      - /data/Projects/Oceanography/OGCM/LLC/Fronts/LLC4320_SST144_SSS40_train.h5
+      - /home/xavier/Projects/Oceanography/data/OGCM/LLC/Fronts/LLC4320_SST144_SSS40_train.h5
 
     slice_builder:
       name: SliceBuilder
@@ -54,7 +54,7 @@ loaders:
           expand_dims: true
   val:
     file_paths:
-      - /data/Projects/Oceanography/OGCM/LLC/Fronts/LLC4320_SST144_SSS40_valid.h5
+      - /home/xavier/Projects/Oceanography/data/OGCM/LLC/Fronts/LLC4320_SST144_SSS40_valid.h5
 
     slice_builder:
       name: SliceBuilder
