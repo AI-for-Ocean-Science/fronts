@@ -37,6 +37,7 @@ def main(pargs):
 
     from fronts.llc import io as llc_io
     from fronts.llc import extract as llc_extract
+    from fronts.plotting import images as pimages
 
     # Load the table
     print("Loading the table..")
@@ -85,7 +86,8 @@ def main(pargs):
 
         for ss, image in enumerate(images):
             ax = plt.subplot(gs[ss])
-            sns.heatmap(image, ax=ax, clbl=fields[ss])
+            pimages.show_image(image, ax=ax, clbl=fields[ss])
+            
 
         if pargs.fig_file is not None:
             plt.savefig(pargs.fig_file, dpi=300)
