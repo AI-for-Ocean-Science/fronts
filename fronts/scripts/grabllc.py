@@ -1,11 +1,11 @@
-""" Script to genreate a reconstructed cutout """
+""" Script to grab/plot data from LLC """
 
 from IPython import embed
 
 def parser(options=None):
     import argparse
     # Parse
-    parser = argparse.ArgumentParser(description='Grab LLC data')
+    parser = argparse.ArgumentParser(description='Grab/plot LLC data')
     parser.add_argument("table_file", type=str, help="File+path to Preproc file")
     parser.add_argument("UID", type=int, help="Evaluation table filename (.csv)")
     parser.add_argument("--fields", type=str, default="SST,SSS,Divb2", help="Evaluation table filename (.csv)")

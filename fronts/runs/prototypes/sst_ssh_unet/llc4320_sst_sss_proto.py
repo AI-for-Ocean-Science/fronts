@@ -212,8 +212,9 @@ def gen_trainvalid(trainfile_config:str, outroot:str, debug:bool=False):
                           [train_tbl, valid_tbl, test_tbl]):
 
         # Open HDF5 file
-        outfile = os.path.join(local_out_path, f'{outroot}_{froot}.h5')
-        f = h5py.File(outfile, 'w')
+        h5_outfile = os.path.join(local_out_path, f'{outroot}_{froot}.h5')
+        tbl_outfile = os.path.join(local_out_path, f'{outroot}_{froot}.parquet')
+        f = h5py.File(h5_outfile, 'w')
 
         # Debug?
         if debug:
@@ -260,7 +261,12 @@ def gen_trainvalid(trainfile_config:str, outroot:str, debug:bool=False):
 
         # Close it
         f.close()
-        print(f"Wrote: {outfile}")
+        print(f"Wrote: {h5_outfile}")
+
+        # Write the Table too
+        assert catalog.vet_main_table(tbl)
+        fronts_io.write_main_table(tbl, tbl_outfile, to_s3=False)
+        print(f"Wrote: {tbl_outfile}")
 
 # #######################################################33
 def gallery(data_file:str=None, tbl_file:str=None,
