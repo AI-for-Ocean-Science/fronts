@@ -50,6 +50,7 @@ def main(pargs):
     filename = llc_io.grab_llc_datafile(udate, local=True)
     ds = llc_io.load_llc_ds(filename, local=True)
 
+    print("Loading the images...")
     images = []
     for field in fields:
         full = llc_extract.field_from_ds(ds, field)
@@ -67,15 +68,10 @@ def main(pargs):
         plt.clf()
         gs = gridspec.GridSpec(1, nfields)
 
-        # Original
-        ax1 = plt.subplot(gs[0])
-        sns.heatmap(field[0, ...], ax=ax1, xticklabels=[], yticklabels=[], cmap=cm,
-                    vmin=vmnx[0], vmax=vmnx[1])
+        for ss, image in enumerate(images):
+            ax = plt.subplot(gs[ss])
+            sns.heatmap(image, ax=ax, clbl=fields[ss])
 
-        # Reconstructed
-        ax2 = plt.subplot(gs[1])
-        sns.heatmap(recons[0, 0, ...], ax=ax2, xticklabels=[], yticklabels=[], cmap=cm,
-                    vmin=vmnx[0], vmax=vmnx[1])
         if pargs.fig_file is not None:
             plt.savefig(pargs.fig_file, dpi=300)
         if pargs.show:
