@@ -89,7 +89,7 @@ def preproc_field(llc_table:pandas.DataFrame,
         raise IOError("You are likely to exceed the RAM.  Deal")
 
     # Init
-    pp_fields, meta, img_UID, all_sub = [], [], [], []
+    pp_fields, meta, img_UID, all_UID = [], [], [], []
 
     # Loop
 
@@ -209,7 +209,7 @@ def preproc_field(llc_table:pandas.DataFrame,
 
     # Fuss with indices
     embed(header='211 of extract.py/preproc_field')
-    ex_UID = np.array(all_sub)
+    ex_UID = np.array(all_UID)
     img_UID = np.array(img_UID)
     ppf_UID = catalog.match_ids(img_UID, ex_UID, require_in_match=True)
 
