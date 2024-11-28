@@ -74,7 +74,7 @@ def main(pargs):
         # Resize
         images.append(cutout)
         
-    # Show?
+    # Plot?
     if pargs.show or pargs.fig_file is not None:
         # Plot
         fig = plt.figure(figsize=(10, 3))
@@ -95,7 +95,7 @@ def main(pargs):
         if pargs.show:
             plt.show()
 
-    # Save images?
+    # Save?
     if pargs.data_file is not None:
         idict = {}
         for field in fields:

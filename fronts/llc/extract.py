@@ -115,8 +115,8 @@ def preproc_field(llc_table:pandas.DataFrame,
 
         # Parse 
         gd_date = llc_table.datetime == udate
-        sub_idx = np.where(gd_date)[0]
-        all_sub += sub_idx.tolist()  # These really should be the indices of the Table
+        sub_UID = llc_table[gd_date].UID.values
+        all_UID += sub_UID.tolist()  # These really should be the indices of the Table
         coord_tbl = llc_table[gd_date]
 
         # Add to table
@@ -159,7 +159,7 @@ def preproc_field(llc_table:pandas.DataFrame,
         zipitems = [fields]
         if len(fields2) > 0:
             zipitems.append(fields2)
-        zipitems.append(sub_idx)
+        zipitems.append(sub_UID)
         if 'smooth_km' in pdict.keys():
             zipitems.append(smooth_pixs)
         items = [item for item in zip(*zipitems)]
@@ -208,9 +208,10 @@ def preproc_field(llc_table:pandas.DataFrame,
         del answers, fields, items
 
     # Fuss with indices
-    ex_idx = np.array(all_sub)
-    img_idx = np.array(img_idx)
-    ppf_idx = catalog.match_ids(img_idx, ex_idx, require_in_match=True)
+    embed(header='211 of extract.py/preproc_field')
+    ex_UID = np.array(all_sub)
+    img_UID = np.array(img_UID)
+    ppf_UID = catalog.match_ids(img_UID, ex_UID, require_in_match=True)
 
     # Clean up time (indices and bad data)
 
