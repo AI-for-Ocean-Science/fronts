@@ -208,9 +208,9 @@ def preproc_field(llc_table:pandas.DataFrame,
         del answers, fields, items
 
     # Fuss with indices
-    ex_UID = llc_table.UID.values
+    tbl_UID = llc_table.UID.values
     img_UID = np.array(img_UID)
-    ppf_UID = catalog.match_ids(img_UID, ex_UID, require_in_match=True)
+    ppf_UID = catalog.match_ids(img_UID, tbl_UID, require_in_match=True)
 
     # Clean up time (indices and bad data)
 
@@ -229,13 +229,13 @@ def preproc_field(llc_table:pandas.DataFrame,
     pp_fields = np.array(pp_fields)[ppf_UID]
 
     # Meta time
-    embed(header='232 of extract')
     good_meta = pandas.DataFrame([item for item in meta if item is not None])
     final_meta = pandas.DataFrame()
+    tbl_idx = catalog.match_ids(good_idx, tbl_UID, require_in_match=True)
     for key in good_meta.keys():
         final_meta[key] = np.zeros(len(ppf_UID))
         #
-        final_meta.loc[good_idx, key] = good_meta[key].values
+        final_meta.loc[tbl_idx, key] = good_meta[key].values
 
     # Return
     return llc_table, success, pp_fields, final_meta
