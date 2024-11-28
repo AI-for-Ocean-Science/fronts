@@ -89,7 +89,7 @@ def preproc_field(llc_table:pandas.DataFrame,
         raise IOError("You are likely to exceed the RAM.  Deal")
 
     # Init
-    pp_fields, meta, img_idx, all_sub = [], [], [], []
+    pp_fields, meta, img_UID, all_sub = [], [], [], []
 
     # Loop
 
@@ -202,7 +202,7 @@ def preproc_field(llc_table:pandas.DataFrame,
 
         # Slurp
         pp_fields += [item[0] for item in answers]
-        img_idx += cur_img_idx
+        img_UID += cur_img_idx
         meta += [item[2] for item in answers]
 
         del answers, fields, items
@@ -216,8 +216,8 @@ def preproc_field(llc_table:pandas.DataFrame,
     # Clean up time (indices and bad data)
 
     # Find the bad ones (if any)
-    bad_idx = [int(item[1]) for item in zip(pp_fields, img_idx) if item[0] is None]
-    good_idx = np.array([int(item[1]) for item in zip(pp_fields, img_idx) if item[0] is not None])
+    bad_idx = [int(item[1]) for item in zip(pp_fields, img_UID) if item[0] is None]
+    good_idx = np.array([int(item[1]) for item in zip(pp_fields, img_UID) if item[0] is not None])
 
     success = np.ones(len(pp_fields), dtype=bool)
 
@@ -227,13 +227,13 @@ def preproc_field(llc_table:pandas.DataFrame,
         for ii in bad_idx:
             pp_fields[ii] = bad_img.copy()
             success[ii] = False
-    pp_fields = np.array(pp_fields)[ppf_idx]
+    pp_fields = np.array(pp_fields)[ppf_UID]
 
     # Meta time
     good_meta = pandas.DataFrame([item for item in meta if item is not None])
     final_meta = pandas.DataFrame()
     for key in good_meta.keys():
-        final_meta[key] = np.zeros(len(ppf_idx))
+        final_meta[key] = np.zeros(len(ppf_UID))
         #
         final_meta.loc[good_idx, key] = good_meta[key].values
 
