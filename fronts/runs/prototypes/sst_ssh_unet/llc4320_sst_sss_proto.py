@@ -354,7 +354,7 @@ def main(flg:str):
     # Generate the Training, Validation, Test files
     if flg == 3:
         json_file = 'llc4320_sst144_sss40_tvfile.json'
-        gen_trainvalid(json_file, 'LLC4320_SST144_SSS40', debug=True)
+        gen_trainvalid(json_file, 'LLC4320_SST144_SSS40', debug=False)
 
     # Examine a set of images
     if flg == 10:
