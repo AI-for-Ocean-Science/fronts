@@ -211,9 +211,6 @@ def gen_trainvalid(trainfile_config:str, outroot:str, debug:bool=False):
     for froot, tbl in zip(['train', 'valid', 'test'], 
                           [train_tbl, valid_tbl, test_tbl]):
 
-        if debug and froot == 'train':
-            continue
-
         # Open HDF5 file
         h5_outfile = os.path.join(local_out_path, f'{outroot}_{froot}.h5')
         tbl_outfile = os.path.join(local_out_path, f'{outroot}_{froot}.parquet')
