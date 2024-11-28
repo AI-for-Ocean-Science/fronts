@@ -1,6 +1,6 @@
 {
     "balance": {
-        "metric": "logDivb2mu",
+        "metric": "logDivb290",
         "nbins": 20
     },
     "dataset": "LLC4320",
@@ -36,6 +36,7 @@
             "dx": 2.25,
             "field_size": 64,
             "fixed_km": 144.0,
+            "percentile": 90.0,
             "threshold": 1e-14
         }
     }

@@ -5,16 +5,17 @@ import pandas
 
 from IPython import embed
 
-def tvt(super_tbl:pandas.DataFrame, config:dict):
+def gen_tvt(super_tbl:pandas.DataFrame, config:dict):
 
     ntot = config['ntrain'] + config['nvalid'] + config['ntest']
 
     if 'balance' in config.keys():
+        metric = config['balance']['metric']
 
-        if config['balance']['metric'] == 'logDivb2mu':
-            vals = np.log10(super_tbl['Divb2mu'].values)
+        if metric[:3] == 'log':
+            vals = np.log10(super_tbl[metric[3:]].values)
         else:
-            raise ValueError(f"Balance type not supported {config['balance']['metric']}")
+            vals = super_tbl[metric].values
 
         # Histogram
         nbins = config['balance']['nbins']

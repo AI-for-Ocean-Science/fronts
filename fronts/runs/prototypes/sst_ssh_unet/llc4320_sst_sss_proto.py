@@ -202,7 +202,7 @@ def gen_trainvalid(trainfile_config:str, outroot:str, debug:bool=False):
     # Generate the tables
     #embed(header='194 of llc4320_sst_ssh_proto.py')
     #reload(train_tables)
-    train_tbl, valid_tbl, test_tbl = train_tables.tvt(
+    train_tbl, valid_tbl, test_tbl = train_tables.gen_tvt(
         llc_table, config_dict)
 
     field_size = config_dict['field_size']
@@ -252,9 +252,16 @@ def gen_trainvalid(trainfile_config:str, outroot:str, debug:bool=False):
                     embed(header='Not all successful!')
 
                 # Threshold?
-                if ftype == 'targets' and 'threshold' in config_dict[ftype][field].keys():
-                    # THIS IS WRONG IF WE HAVE MULTIPLE THRESHOLDS
-                    pp_fields = (pp_fields > config_dict[ftype][field]['threshold']).astype(np.float32)
+                if ftype == 'targets' and ('threshold' in config_dict[ftype][field].keys() or
+                  'precentile' in config_dict[ftype][field].keys()):
+                    segments = np.ones_like(pp_fields)
+                    if 'threshold' in config_dict[ftype][field].keys():
+                        segments &= pp_fields > config_dict[ftype][field]['threshold']
+                    if 'percentile' in config_dict[ftype][field].keys():
+                        embed(header='-261 of proto')
+                        #per = np.percentile()
+                        segments &= pp_fields > config_dict[ftype][field]['percentile']
+                    pp_fields = segments.astype(np.float32)
 
                 # Fill in
                 darray[:,nchannel,0,:,:] = pp_fields
