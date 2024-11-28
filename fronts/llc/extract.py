@@ -210,7 +210,7 @@ def preproc_field(llc_table:pandas.DataFrame,
     # Fuss with indices
     tbl_UID = llc_table.UID.values
     img_UID = np.array(img_UID)
-    ppf_UID = catalog.match_ids(img_UID, tbl_UID, require_in_match=True)
+    ppf_UID = catalog.match_ids(tbl_UID, img_UID, require_in_match=True)
 
     # Clean up time (indices and bad data)
 
@@ -220,7 +220,6 @@ def preproc_field(llc_table:pandas.DataFrame,
 
     success = np.ones(len(pp_fields), dtype=bool)
 
-    embed(header='extract.py/preproc_field 223')
     # Replace with -1 images
     if len(bad_idx) > 0:
         bad_img = -1*np.ones(field_size)
