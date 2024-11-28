@@ -258,7 +258,7 @@ def gen_trainvalid(trainfile_config:str, outroot:str, debug:bool=False):
             # Write inputs
             dset = f.create_dataset(ftype, data=darray)
             dset.attrs['fields'] = list(config_dict[ftype].keys())
-            dset.attrs['UID'] = tbl.UID.values.astype(str)
+            dset.attrs['UID'] = tbl.UID.values.astype(str).astype('S')
 
         # Close it
         f.close()
