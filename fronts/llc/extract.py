@@ -208,8 +208,7 @@ def preproc_field(llc_table:pandas.DataFrame,
         del answers, fields, items
 
     # Fuss with indices
-    embed(header='211 of extract.py/preproc_field')
-    ex_UID = np.array(all_UID)
+    ex_UID = llc_table.UID.values
     img_UID = np.array(img_UID)
     ppf_UID = catalog.match_ids(img_UID, ex_UID, require_in_match=True)
 

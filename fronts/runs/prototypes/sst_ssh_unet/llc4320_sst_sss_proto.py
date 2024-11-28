@@ -218,7 +218,7 @@ def gen_trainvalid(trainfile_config:str, outroot:str, debug:bool=False):
 
         # Debug?
         if debug:
-            tbl = tbl.iloc[:5].copy()
+            tbl = tbl.iloc[:8].copy()
 
         # Loop on Inputs and Targets
         for ftype in ['inputs', 'targets']:
@@ -258,6 +258,7 @@ def gen_trainvalid(trainfile_config:str, outroot:str, debug:bool=False):
             # Write inputs
             dset = f.create_dataset(ftype, data=darray)
             dset.attrs['fields'] = list(config_dict[ftype].keys())
+            dset.attrs['UID'] = tbl.UID.values.astype(str)
 
         # Close it
         f.close()
