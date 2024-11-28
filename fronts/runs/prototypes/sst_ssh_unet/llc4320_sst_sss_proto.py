@@ -218,7 +218,7 @@ def gen_trainvalid(trainfile_config:str, outroot:str, debug:bool=False):
 
         # Debug?
         if debug:
-            tbl = tbl.iloc[:8].copy()
+            tbl = tbl.iloc[:5].copy()
 
         # Loop on Inputs and Targets
         for ftype in ['inputs', 'targets']:
