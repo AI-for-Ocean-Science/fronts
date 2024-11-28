@@ -252,10 +252,10 @@ def gen_trainvalid(trainfile_config:str, outroot:str, debug:bool=False):
                 if ftype == 'targets' and ('threshold' in config_dict[ftype][field].keys() or
                   'precentile' in config_dict[ftype][field].keys()):
                     segments = np.ones_like(pp_fields)
+                    embed(header='-261 of proto')
                     if 'threshold' in config_dict[ftype][field].keys():
                         segments &= pp_fields > config_dict[ftype][field]['threshold']
                     if 'percentile' in config_dict[ftype][field].keys():
-                        embed(header='-261 of proto')
                         #per = np.percentile()
                         segments &= pp_fields > config_dict[ftype][field]['percentile']
                     pp_fields = segments.astype(np.float32)
