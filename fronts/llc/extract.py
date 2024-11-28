@@ -229,6 +229,7 @@ def preproc_field(llc_table:pandas.DataFrame,
     pp_fields = np.array(pp_fields)[ppf_UID]
 
     # Meta time
+    embed(header='232 of extract')
     good_meta = pandas.DataFrame([item for item in meta if item is not None])
     final_meta = pandas.DataFrame()
     for key in good_meta.keys():
