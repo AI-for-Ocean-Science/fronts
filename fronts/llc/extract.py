@@ -220,6 +220,7 @@ def preproc_field(llc_table:pandas.DataFrame,
 
     success = np.ones(len(pp_fields), dtype=bool)
 
+    embed(header='extract.py/preproc_field 223')
     # Replace with -1 images
     if len(bad_idx) > 0:
         bad_img = -1*np.ones(field_size)
