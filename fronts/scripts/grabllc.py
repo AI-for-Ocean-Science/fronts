@@ -50,6 +50,7 @@ def main(pargs):
     # Grab the data
     udate = idf.datetime
     filename = llc_io.grab_llc_datafile(udate, local=True)
+    print(f"Loading the LLC data from {filename}")
     ds = llc_io.load_llc_ds(filename, local=True)
 
     # Deal with fixed
