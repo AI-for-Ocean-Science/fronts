@@ -1,4 +1,7 @@
-# Trained on data from the 2018 Kaggle Data Science Bowl: https://www.kaggle.com/c/data-science-bowl-2018/data
+# AA
+#  Inputs = Div SST, SST, SSS
+#  Targets = Divb2 > 1e-14 + >=90%
+#  Vanila U-Net
 model:
   name: UNet2D
   in_channels: 3
@@ -38,7 +41,7 @@ loaders:
   label_internal_path: targets
   train:
     file_paths:
-      - /home/xavier/Projects/Oceanography/data/OGCM/LLC/Fronts/LLC4320_SST144_SSS40_train.h5
+      - /home/xavier/Projects/Oceanography/data/OGCM/LLC/Fronts/Training_Sets/LLC4320_SST144_SSS40_trainA.h5
 
     slice_builder:
       name: SliceBuilder
