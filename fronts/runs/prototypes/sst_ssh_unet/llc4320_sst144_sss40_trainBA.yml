@@ -1,7 +1,7 @@
 # BA
 #  Inputs = Div SST, SST, SSS
 #  Targets = Divb2 
-#  Vanila U-Net with MSE loss
+#  Vanila U-Net with MSE loss and evaluation
 model:
   name: UNet2D
   in_channels: 3
@@ -9,7 +9,7 @@ model:
   layer_order: cr
   f_maps: [32, 64, 128]
   final_sigmoid: true
-  is_segmentation: true
+  is_segmentation: false
 trainer:
   checkpoint_dir: /home/xavier/Projects/Oceanography/data/OGCM/LLC/Fronts/Models/BA
   resume: null
@@ -26,7 +26,7 @@ loss:
   name: MSELoss
   skip_last_target: false
 eval_metric:
-  name: DiceCoefficient
+  name: MSE
   use_last_target: true
 lr_scheduler:
   name: ReduceLROnPlateau
