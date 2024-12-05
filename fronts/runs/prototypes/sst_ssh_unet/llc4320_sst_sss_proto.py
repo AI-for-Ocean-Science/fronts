@@ -245,8 +245,8 @@ def gen_trainvalid(trainfile_config:str, outroot:str, debug:bool=False):
 
         # Loop on Inputs and Targets
         for ftype in ['inputs', 'targets']:
-            #if debug and ftype == 'inputs':
-            #    continue
+            if debug and ftype == 'inputs':
+                continue
 
             # Data array
             ntype = len(config_dict[ftype].keys())
@@ -284,6 +284,7 @@ def gen_trainvalid(trainfile_config:str, outroot:str, debug:bool=False):
                             segments[kk] &= pp_fields[kk] > per[kk]
                     pp_fields = segments.astype(np.float32)
 
+                embed(header='287 of proto')
                 # Fill in
                 darray[:,nchannel,0,:,:] = pp_fields
             # Write inputs
@@ -387,7 +388,7 @@ def main(flg:str):
         #   Inputs = Div SST, SST, SSS 
         #   Targets = Divb2 normalized by <b>
         json_file = 'llc4320_sst144_sss40_tvfileC.json'
-        gen_trainvalid(json_file, 'LLC4320_SST144_SSS40', debug=False)
+        gen_trainvalid(json_file, 'LLC4320_SST144_SSS40', debug=True)
 
     # Examine a set of images
     if flg == 10:
