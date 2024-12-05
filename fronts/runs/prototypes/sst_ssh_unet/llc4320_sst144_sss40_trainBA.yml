@@ -2,6 +2,7 @@
 #  Inputs = Div SST, SST, SSS
 #  Targets = Divb2 
 #  Vanila U-Net with MSE loss and evaluation
+#  python train.py --config ../../fronts/fronts/runs/prototypes/sst_ssh_unet/llc4320_sst144_sss40_trainBA.yml
 model:
   name: UNet2D
   in_channels: 3
@@ -18,7 +19,7 @@ trainer:
   log_after_iters: 250
   max_num_epochs: 10000
   max_num_iterations: 150000
-  eval_score_higher_is_better: True
+  eval_score_higher_is_better: False
 optimizer:
   learning_rate: 0.0002
   weight_decay: 0.00001
