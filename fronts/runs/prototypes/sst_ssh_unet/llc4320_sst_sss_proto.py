@@ -222,8 +222,8 @@ def gen_trainvalid(trainfile_config:str, outroot:str, debug:bool=False):
 
         # Loop on Inputs and Targets
         for ftype in ['inputs', 'targets']:
-            if debug and ftype == 'inputs':
-                continue
+            #if debug and ftype == 'inputs':
+            #    continue
 
             # Data array
             ntype = len(config_dict[ftype].keys())
