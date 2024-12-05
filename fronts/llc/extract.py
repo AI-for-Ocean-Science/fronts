@@ -23,7 +23,7 @@ def field_from_ds(ds, field:str):
             data += 273.15 # Kelvin
     elif field == 'SSS':
         data = ds.Salt.values
-    elif field == 'Divb2':
+    elif field in ['Divb2', 'normDivb2']:
         data = ds.Theta.values
         data2 = ds.Salt.values
     else:

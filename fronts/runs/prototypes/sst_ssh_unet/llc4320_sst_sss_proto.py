@@ -383,7 +383,10 @@ def main(flg:str):
         # B: 
         #   Inputs = Div SST, SST, SSS 
         #   Targets = Divb2 
-        json_file = 'llc4320_sst144_sss40_tvfileB.json'
+        # C:
+        #   Inputs = Div SST, SST, SSS 
+        #   Targets = Divb2 normalized by <b>
+        json_file = 'llc4320_sst144_sss40_tvfileC.json'
         gen_trainvalid(json_file, 'LLC4320_SST144_SSS40', debug=False)
 
     # Examine a set of images
