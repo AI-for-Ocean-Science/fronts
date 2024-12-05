@@ -185,6 +185,29 @@ def preproc_super(extract_file:str, debug:bool=False):
         fronts_io.write_main_table(llc_table, tbl_file, to_s3=False)
 
 def gen_trainvalid(trainfile_config:str, outroot:str, debug:bool=False):
+    """
+    Generates training and validation datasets from a given configuration file.
+    Args:
+        trainfile_config (str): Path to the JSON configuration file for training.
+        outroot (str): Root name for the output files.
+        debug (bool, optional): If True, processes only a small subset of the data for debugging purposes. Defaults to False.
+    Raises:
+        ValueError: If the dataset specified in the configuration file is not 'LLC4320'.
+        ValueError: If the format specified in the configuration file is not 'unet3d'.
+    The function performs the following steps:
+        1. Loads the LLC4320 table from a parquet file.
+        2. Filters the table to include only rows where 'pp_type' is 0.
+        3. Loads the configuration dictionary from the specified JSON file.
+        4. Validates that the dataset specified in the configuration is 'LLC4320'.
+        5. Generates training, validation, and test tables using the configuration.
+        6. Processes each table (train, valid, test) to generate HDF5 and parquet files.
+        7. For each table, loops through 'inputs' and 'targets' to preprocess fields and store them in the HDF5 file.
+        8. Writes the processed data to HDF5 and parquet files.
+        9. Validates and writes the main table to a parquet file.
+    Note:
+        The function assumes the existence of several external modules and functions such as `train_tables.gen_tvt`, 
+        `extract.preproc_field`, `catalog.vet_main_table`, and `fronts_io.write_main_table`.
+    """
 
     # Load
     llc_table = pandas.read_parquet(super_tbl_file)
@@ -212,8 +235,8 @@ def gen_trainvalid(trainfile_config:str, outroot:str, debug:bool=False):
                           [train_tbl, valid_tbl, test_tbl]):
 
         # Open HDF5 file
-        h5_outfile = os.path.join(local_out_path, f'{outroot}_{froot}.h5')
-        tbl_outfile = os.path.join(local_out_path, f'{outroot}_{froot}.parquet')
+        h5_outfile = os.path.join(local_out_path, 'Training_Sets', f'{outroot}_{froot}{config_dict['name']}.h5')
+        tbl_outfile = os.path.join(local_out_path, 'Training_Sets', f'{outroot}_{froot}{config_dict['name']}.parquet')
         f = h5py.File(h5_outfile, 'w')
 
         # Debug?
@@ -248,7 +271,7 @@ def gen_trainvalid(trainfile_config:str, outroot:str, debug:bool=False):
                 if np.any(~success):
                     embed(header='Not all successful!')
 
-                # Threshold?
+                # Threshold or percentile?
                 if ftype == 'targets' and ('threshold' in config_dict[ftype][field].keys() or
                   'precentile' in config_dict[ftype][field].keys()):
                     segments = np.ones_like(pp_fields, dtype=bool)
@@ -353,7 +376,14 @@ def main(flg:str):
 
     # Generate the Training, Validation, Test files
     if flg == 3:
-        json_file = 'llc4320_sst144_sss40_tvfile.json'
+        # A: 
+        #   Inputs = Div SST, SST, SSS 
+        #   Targets = Divb2 > 1e-14 + >=90%
+        #json_file = 'llc4320_sst144_sss40_tvfileA.json'
+        # B: 
+        #   Inputs = Div SST, SST, SSS 
+        #   Targets = Divb2 
+        json_file = 'llc4320_sst144_sss40_tvfileB.json'
         gen_trainvalid(json_file, 'LLC4320_SST144_SSS40', debug=False)
 
     # Examine a set of images

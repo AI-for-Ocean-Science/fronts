@@ -1,4 +1,7 @@
-# Trained on data from the 2018 Kaggle Data Science Bowl: https://www.kaggle.com/c/data-science-bowl-2018/data
+# BA
+#  Inputs = Div SST, SST, SSS
+#  Targets = Divb2 
+#  Vanila U-Net with MSE loss
 model:
   name: UNet2D
   in_channels: 3
@@ -8,7 +11,7 @@ model:
   final_sigmoid: true
   is_segmentation: true
 trainer:
-  checkpoint_dir: /home/xavier/Projects/Oceanography/python/fronts/fronts/runs/prototypes/sst_ssh_unet/check_points
+  checkpoint_dir: /home/xavier/Projects/Oceanography/data/OGCM/LLC/Fronts/Models/BA
   resume: null
   pre_trained: null
   validate_after_iters: 250
@@ -20,7 +23,7 @@ optimizer:
   learning_rate: 0.0002
   weight_decay: 0.00001
 loss:
-  name: DiceLoss
+  name: MSELoss
   skip_last_target: false
 eval_metric:
   name: DiceCoefficient
@@ -38,7 +41,7 @@ loaders:
   label_internal_path: targets
   train:
     file_paths:
-      - /home/xavier/Projects/Oceanography/data/OGCM/LLC/Fronts/LLC4320_SST144_SSS40_train.h5
+      - /home/xavier/Projects/Oceanography/data/OGCM/LLC/Fronts/Training_Sets/LLC4320_SST144_SSS40_trainB.h5
 
     slice_builder:
       name: SliceBuilder
@@ -54,7 +57,7 @@ loaders:
           expand_dims: true
   val:
     file_paths:
-      - /home/xavier/Projects/Oceanography/data/OGCM/LLC/Fronts/LLC4320_SST144_SSS40_valid.h5
+      - /home/xavier/Projects/Oceanography/data/OGCM/LLC/Fronts/Training_Sets/LLC4320_SST144_SSS40_validB.h5
 
     slice_builder:
       name: SliceBuilder
